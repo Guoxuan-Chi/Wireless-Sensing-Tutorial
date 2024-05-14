@@ -1,4 +1,4 @@
-# CSI Data Collection
+# 📶 CSI Data Collection
 
 CSI data collection is the first step toward the implementation of a practical wireless sensing system. This section introduces one of the most famous Wi-Fi sensing datasets, the Widar3 dataset, so that beginners can quickly get start with wireless sensing with minimal effort. This section also introduces three of the most famous CSI collection tools that researchers can use to try out collecting CSI data with COTS NICs
 

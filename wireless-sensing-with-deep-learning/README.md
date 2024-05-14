@@ -1,9 +1,10 @@
 # 🖥️ Wireless Sensing with Deep Learning
 
-:::tip\
-All the code and data in this tutorial are available. Click [**here**](http://tns.thss.tsinghua.edu.cn/wst/wst\_code.zip) to download it! :::
+{% hint style="info" %}
+All the code and data in this tutorial are available. Click [**here**](http://tns.thss.tsinghua.edu.cn/wst/wst\_code.zip) to download it!&#x20;
 
 This section introduces a series of learning algorithms, especially the prevalent deep neural network models such as CNN and RNN, and their applications in wireless sensing. This section also proposes a complex-valued neural network to accomplish learning and inference based on wireless features efficiently.
+{% endhint %}
 
 ## Convolutional Neural Network
 

@@ -1,4 +1,4 @@
-# CSI Sanitization
+# 🌊 CSI Sanitization
 
 :::warning This section is an **advanced content**, and is written for developers who already have enough experience in designing wireless localization and tracking systems. If you are a beginner, or a researcher only focusing on deep-learning-based wireless sensing, you may skip this section. :::
 
