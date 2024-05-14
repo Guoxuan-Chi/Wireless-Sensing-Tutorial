@@ -14,7 +14,9 @@ In recent years, wireless sensing technology has attracted many research interes
 
 ## Comparison of Wireless Sensing and Computer Vision
 
-\*\* Fig. 1. Comparision of vision-based sensing and RF-based sensing processes. \*\*
+
+
+<figure><img src=".gitbook/assets/sensing_process.png" alt=""><figcaption><p>Fig. 1. Comparision of vision-based sensing and RF-based sensing processes. </p></figcaption></figure>
 
 Typical RF signals (300 kHz - 300 GHz) and visible light signals (380 THz - 750 THz) are essentially electromagnetic (EM) waves. When propagating in our physical world, the EM waves experience a variety of physical phenomena such as reflection, diffraction, and scattering. Multipath signals are eventually superimposed and received by the receiver. Therefore, the received superimposed signals carry the physical information of the signal propagation space.
 
