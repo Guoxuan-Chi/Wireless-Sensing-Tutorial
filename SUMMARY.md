@@ -8,4 +8,3 @@
 * [🌊 CSI Sanitization](csi-sanitization.md)
 * [🖥️ Wireless Sensing with Deep Learning](wireless-sensing-with-deep-learning.md)
 * [📑 Supplementary Materials](supplementary-materials.md)
-* [📋 Download the Code](download-the-code.md)

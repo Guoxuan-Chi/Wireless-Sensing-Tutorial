@@ -10,11 +10,11 @@ This tutorial takes Wi-Fi sensing as an example. It introduces both the **theore
 
 We believe this tutorial will help people in other research fields break into wireless sensing research and learn more about its theories, designs, and implementation skills, promoting prosperity in the field of wireless sensing.
 
-{% hint style="info" %}
+{% hint style="success" %}
 All the code and data in this tutorial are available. Click [**here**](http://tns.thss.tsinghua.edu.cn/wst/docs/code\_download) to download it!
 {% endhint %}
 
-{% hint style="info" %}
+{% hint style="success" %}
 Our paper [**"Hands-on Wireless Sensing with Wi-Fi: A Tutorial"**](https://arxiv.org/abs/2206.09532) has been published on ArXiv. Click to get the PDF version.
 {% endhint %}
 
