@@ -6,64 +6,102 @@ All the code and data in this tutorial are available. Click [**here**](http://tn
 This section introduces a series of learning algorithms, especially the prevalent deep neural network models such as CNN and RNN, and their applications in wireless sensing. This section also proposes a complex-valued neural network to accomplish learning and inference based on wireless features efficiently.
 {% endhint %}
 
-## Convolutional Neural Network
+This section will present a working example to demonstrate how to apply CNN for wireless sensing. Specifically, we use commodity Wi-Fi to recognize six human gestures. The gestures are illustrated in Figure. 9. We deploy a Wi-Fi transmitter and six receivers in a typical classroom, and the device setup is sketched in Figure. 10. The users are asked to perform gestures at the five marked locations and to five orientations. The data samples can be found in our widar3.0 dataset .&#x20;
 
-Convolutional Neural Network (CNN) contributes to the recent advances in understanding images, videos, and audios. Some workshave exploited CNN for wireless signal understanding in wireless sensing tasks and achieved promising performance. This section will present a working example to demonstrate how to apply CNN for wireless sensing. Specifically, we use commodity Wi-Fi to recognize six human gestures. The gestures are illustrated in Figure. 9. We deploy a Wi-Fi transmitter and six receivers in a typical classroom, and the device setup is sketched in Figure. 10. The users are asked to perform gestures at the five marked locations and to five orientations. The data samples can be found in our released dataset . We extract DFS from raw CSI signals and feed them into a CNN network. The network architecture is shown in Figure. 11.
+<figure><img src=".gitbook/assets/gestures.png" alt=""><figcaption><p>Fig. 9. Sketches of gestures evaluated in the experiment.</p></figcaption></figure>
 
-&#x20;\*\* Fig. 9. Sketches of gestures evaluated in the experiment.\*\*
+<figure><img src=".gitbook/assets/floor_plan.png" alt=""><figcaption><p>Fig. 10. The setup of Wi-Fi devices for gesture recognition task.</p></figcaption></figure>
 
-&#x20;\*\* Fig. 10. The setup of Wi-Fi devices for gesture recognition task.\*\*
 
-&#x20;\*\* Fig. 11. Convolutional Neural Network architecture.\*\*
 
-We now introduce the implementation code in detail.
+## Data Preperation
 
-First, some necessary packages are imported. We use Keras API with TensorFlow as the backend to demonstrate how to implement the neural network.
 
-```python
-import os,sys
-import numpy as np
-import scipy.io as scio
-import tensorflow as tf
-import keras
-from keras.layers import Input, GRU, Dense, Flatten, Dropout, Conv2D, Conv3D, MaxPooling2D, MaxPooling3D, TimeDistributed, Bidirectional, Multiply, Permute, RepeatVector, Concatenate, Dot, Lambda
-from keras.models import Model, load_model
-import keras.backend as K
-from sklearn.metrics import confusion_matrix
-from keras.backend.tensorflow_backend import set_session
-from sklearn.model_selection import train_test_split
-```
 
-Then we define some parameters, including the hyperparameters and the data path. The fraction of testing data is defined as 0.1. To simplify the problem, we only use six gesture types in the widar3.0 dataset.
+## Training and Testing
 
-```Python
-# Parameters
-fraction_for_test = 0.1
-data_dir = 'widar30dataset/DFS/20181130/'
-ALL_MOTION = [1,2,3,4,5,6]
-N_MOTION = len(ALL_MOTION)
-T_MAX = 0
-n_epochs = 200
-f_dropout_ratio = 0.5
-n_gru_hidden_units = 64
-n_batch_size = 32
-f_learning_rate = 0.001
-```
 
-The program begins with loading data with the predefined function `load_data`. The loaded data are split into train and test by calling the API function `train_test_split`. The labels of the training data are encoded into the one-hot format with the predefined function `onehot_encoding`.
+
+
+
+## Model Construction
+
+### 1. Convolutional Neural Network
+
+Convolutional Neural Network (CNN) contributes to the recent advances in understanding images, videos, and audios. Some works have exploited CNN for wireless signal understanding in wireless sensing tasks and achieved promising performance. We extract DFS from raw CSI signals and feed them into our modified ResNet-18 network.
 
 ```python
-# Load data
-data, label = load_data(data_dir)
-print('\nLoaded dataset of ' + str(label.shape[0]) + ' samples, each sized ' + str(data[0,:,:,:,:].shape) + '\n')
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from einops import rearrange
 
-# Split train and test
-[data_train, data_test, label_train, label_test] = train_test_split(data, label, test_size=fraction_for_test)
-print('\nTrain on ' + str(label_train.shape[0]) + ' samples\n' +\
-    'Test on ' + str(label_test.shape[0]) + ' samples\n')
+class ResNetBasicBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
+        super(ResNetBasicBlock, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size[0], stride=stride[0], padding=padding[0])
+        self.bn1 = nn.BatchNorm2d(out_channels)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size[1], stride=stride[1], padding=padding[1])
+        self.bn2 = nn.BatchNorm2d(out_channels)
+        self.relu = nn.ReLU()
 
-# One-hot encoding for train data
-label_train = onehot_encoding(label_train, N_MOTION)
+    def forward(self, x):
+        output = self.conv1(x)
+        output = self.relu(self.bn1(output))
+        output = self.conv2(output)
+        output = self.bn2(output)
+        return self.relu(x + output)
+
+class ResNetDownBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
+        super(ResNetDownBlock, self).__init__()
+        self.extra = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size[0], stride=stride[0], padding=padding[0]),
+            nn.BatchNorm2d(out_channels)
+        )
+        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size[1], stride=stride[1], padding=padding[1])
+        self.bn1 = nn.BatchNorm2d(out_channels)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size[2], stride=stride[2], padding=padding[2])
+        self.bn2 = nn.BatchNorm2d(out_channels)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        extra_x = self.extra(x)
+        out = self.conv1(x)
+        out = self.relu(self.bn1(out))
+        out = self.conv2(out)
+        out = self.bn2(out)
+        return self.relu(extra_x + out)
+
+class ResNet18(nn.Module):
+    def __init__(self, num_classes=6):
+        super(ResNet18, self).__init__()
+        self.conv1 = nn.Conv2d(6, 64, kernel_size=[10,111], stride=[1,8], padding=[0,0])
+        self.bn1 = nn.BatchNorm2d(64)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.layer1 = nn.Sequential(ResNetBasicBlock(64, 64, [3, 3], [1, 1], [1, 1]),
+                                    ResNetBasicBlock(64, 64, [3, 3], [1, 1], [1, 1]))
+        self.layer2 = nn.Sequential(ResNetDownBlock(64, 128, [1, 3, 3], [2, 2, 1], [0, 1, 1]),
+                                    ResNetBasicBlock(128, 128, [3, 3], [1, 1], [1, 1]))
+        self.layer3 = nn.Sequential(ResNetDownBlock(128, 256, [1, 3, 3], [2, 2, 1], [0, 1, 1]),
+                                    ResNetBasicBlock(256, 256, [3, 3], [1, 1], [1, 1]))
+        self.layer4 = nn.Sequential(ResNetDownBlock(256, 512, [1, 3, 3], [2, 2, 1], [0, 1, 1]),
+                                    ResNetBasicBlock(512, 512, [3, 3], [1, 1], [1, 1]))
+        self.avgpool = nn.AdaptiveAvgPool2d(output_size=(1, 1))
+        self.fc = nn.Linear(512, num_classes)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        x = self.relu(self.bn1(self.conv1(x)))
+        x = self.maxpool(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.avgpool(x)
+        x = rearrange(x, "b d 1 1 -> b d")
+        x = self.fc(x)
+        return x
 ```
 
 After loading and formatting the training and testing data, we defined the model with the predefined function \lstinline{build\_model}. After that, we train the model by calling the API function \lstinline{fit}. The input data and label are specified in the parameters. The fraction of validation data is specified as 0.1.

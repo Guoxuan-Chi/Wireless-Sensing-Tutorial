@@ -1,9 +1,12 @@
 # 🌊 CSI Sanitization
 
-:::warning This section is an **advanced content**, and is written for developers who already have enough experience in designing wireless localization and tracking systems. If you are a beginner, or a researcher only focusing on deep-learning-based wireless sensing, you may skip this section. :::
+{% hint style="info" %}
+All the code and data in this tutorial are available.  Click [**here**](http://tns.thss.tsinghua.edu.cn/wst/wst\_code.zip) to download!&#x20;
+{% endhint %}
 
-:::tip\
-All the code and data in this tutorial are available. Click [**here**](http://tns.thss.tsinghua.edu.cn/wst/wst\_code.zip) to download it! :::
+{% hint style="warning" %}
+This section is an **advanced content**, and is written for developers who already have enough experience in designing wireless localization and tracking systems. If you are a beginner, or a researcher only focusing on deep-learning-based wireless sensing, you may skip this section.&#x20;
+{% endhint %}
 
 The wireless sensing models and features described in previous sections are consistent with the EM propagation theory and geometry. However, they don't consider the various types of noise caused by imperfect implementations of transceiver hardware. This section focuses on various CSI error sources and the corresponding error cancellation algorithms.
 

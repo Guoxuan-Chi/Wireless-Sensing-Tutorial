@@ -11,62 +11,62 @@ This section focuses on two mainstream CSI models: the ray-tracing model and the
 In typical indoor environments, a signal sent by the transmitter arrives at the receiver via multiple paths due to the reflection of the radio wave. Along each path, the signal experiences a certain attenuation and phase shift. The received signal is the superimposition of multiple alias versions of the transmitted signal. Therefore, the complex baseband signal strength measured at the receiver at a specific time can be written as follows :
 
 $$
-V=\sum_{n=1}^{N}{\lVert V_n \rVert e^{-j\phi_n}}, \tag{1}
+V=\sum_{n=1}^{N}{\lVert V_n \rVert e^{-j\phi_n}},
 $$
 
-where $V\_n$ and $\phi\_n$ are the amplitude and phase of the $n^{th}$ multipath component (note that the modulation scheme of the signal is implicitly considered), and $N$ is the total number of components. On this basis, the recieve signal strength indicator (RSSI) can be written as the received power in decibels (dB):
+where $$V_n$$ and $$\phi_n$$ are the amplitude and phase of the $$n^{th}$$ multipath component (note that the modulation scheme of the signal is implicitly considered), and $$N$$ is the total number of components. On this basis, the recieve signal strength indicator (RSSI) can be written as the received power in decibels (dB):
 
 $$
-\mathrm{RSSI} = 10\log_2\left( \lVert V \rVert^2 \right). \tag{2}
+\mathrm{RSSI} = 10\log_2\left( \lVert V \rVert^2 \right).
 $$
 
 As the superimposition of multipath components, RSSI not only varies rapidly with propagation distance changing at the order of the signal wavelength but also fluctuates over time, even for a static link. A slight change in specific multipath components may result in significant constructive or destructive multipath components, leading to considerable fluctuations in RSSI.
 
-&#x20;\*\* Fig. 2. Multipath propagations, received signals, and channel responses. \*\*
+<figure><img src=".gitbook/assets/multipath_model.png" alt=""><figcaption><p>Fig. 2. Multipath propagations, received signals, and channel responses. </p></figcaption></figure>
 
 The essential drawback of RSSI is the failure to reflect the multipath effect. The wireless channel is modeled as a linear temporal filter to fully characterize individual paths, known as channel impulse response (CIR). Under the time-invariant assumption, CIR $h(t)$ is represented as:
 
 $$
-h(t) = \sum_{n=1}^{N}{\alpha_n e^{-j\phi_n} \delta(t - \tau_n)}, \tag{3}
+h(t) = \sum_{n=1}^{N}{\alpha_n e^{-j\phi_n} \delta(t - \tau_n)},
 $$
 
-where $\alpha\_n$, $\phi\_n$, and $\tau\_n$ are the complex antenuation, phase, and time delay of the $n^{th}$ path, respectively. $N$ is the total number of multipath and $\delta(\cdot)$ is the Dirac delta function. Each impulse represents a delayed multipath component, multiplied by the corresponding amplitude and phase.
+where $$\alpha_n$$, $$\phi_n$$, and $$\tau_n$$ are the complex antenuation, phase, and time delay of the $$n^{th}$$ path, respectively. $$N$$ is the total number of multipath and $$\delta(\cdot)$$ is the Dirac delta function. Each impulse represents a delayed multipath component, multiplied by the corresponding amplitude and phase.
 
 In the frequency domain, the multipath causes frequency-selective fading, which is characterized by channel frequency response (CFR). CFR is essentially the Fourier transform of CIR. It consists of both the amplitude response and the phase response. Figure. 2 demonstrate a multipath scenario, the transmitted signal, the received signal, and the illustrative channel responses. Both CIR and CFR depict a small-scale multipath effect and are used for fine-grained channel measurement. Note that the complex amplitudes and antennuation are concerned in CIR and CFR, while another pair of parameters in terms of the signal power is Power Delay Profile (PDP) and Power Spectrum Density (PSD).
 
-CIR and CFR are measured by decoupling the transmitted signal from the received signal. Specifically, in the time domain, the received signal $r(t)$ is the convolution of transmitted signal $s(t)$ and channel impulse response $h(t)$:
+CIR and CFR are measured by decoupling the transmitted signal from the received signal. Specifically, in the time domain, the received signal $$r(t)$$ is the convolution of transmitted signal $$s(t)$$ and channel impulse response $$h(t)$$:
 
 $$
-r(t) = s(t) \otimes h(t), \tag{4}
+r(t) = s(t) \otimes h(t),
 $$
 
 which indicates the recieved signal is generated from the transmit signal after it propagating from multipath channel.
 
-Similarly, in the frequency domain, the received signal spectrum $R(f)$ is the multiplication of the transmitted signal spectrum $S(f)$ and the channel frequency response $H(f)$:
+Similarly, in the frequency domain, the received signal spectrum $$R(f)$$ is the multiplication of the transmitted signal spectrum $$S(f)$$ and the channel frequency response $$H(f)$$:
 
 $$
-R(f) = S(f) H(f). \tag{5}
+R(f) = S(f) H(f). (4)
 $$
 
-Note that the $R(f)$ and $S(f)$ are the Fourier transform of the recieved signal $r(t)$ and the transmitted signal $s(t)$ respectively. In this way, Eqn.4 and Eqn.5 forms a beautiful \`\`symmetric'' relationship.
+Note that the $$R(f)$$ and $$S(f)$$ are the Fourier transform of the recieved signal $$r(t)$$ and the transmitted signal $$s(t)$$ respectively. In this way, Eqn.4 and Eqn.5 forms a beautiful \`\`symmetric'' relationship.
 
 As demonstrated in Eqn.4 and Eqn.5, CIR can be derived from the deconvolution operation of received and transmitted signals, and CFR can be treated as the ratio of the received and the transmitted spectrums. Compared with multiplication, the convolution operation is generally time-consuming. Therefore, in most cases, the device focuses on calculating the CFR, and the CIR can be further derived from the CFR using the inverse Fourier transform :
 
 $$
-h(t) = \frac{1}{P_s}\mathfrak{F}^{-1}\left\{ S^*(f)R(f) \right\}, \tag{6}
+h(t) = \frac{1}{P_s}\mathfrak{F}^{-1}\left\{ S^*(f)R(f) \right\},
 $$
 
-where $\mathfrak{F}^{-1}$ denotes the inverse Fourier transform, $\*$ is the conjugate operator, and $P\_s$ approximates the transmitted signal power.
+where $$\mathfrak{F}^{-1}$$ denotes the inverse Fourier transform, $$*$$ is the conjugate operator, and $$P_s$$ approximates the transmitted signal power.
 
-Although the derivation of CIR and CFR is independent of the modulation scheme, it could be more convenient to implement the process on commercial devices with specific modulation schemes. For the wireless standard where the orthogonal frequency division modulation (OFDM) is adopted (e.g., 802.11a/g/n/ac/ax), the amplitude and phase sampled on each subcarrier can be treated as a sampled version of the signal spectrum $S(f)$. On this basis, a sampled version of $H(f)$ can be easily get from the OFDM receivers.
+Although the derivation of CIR and CFR is independent of the modulation scheme, it could be more convenient to implement the process on commercial devices with specific modulation schemes. For the wireless standard where the orthogonal frequency division modulation (OFDM) is adopted (e.g., 802.11a/g/n/ac/ax), the amplitude and phase sampled on each subcarrier can be treated as a sampled version of the signal spectrum $$S(f)$$. On this basis, a sampled version of $$H(f)$$ can be easily get from the OFDM receivers.
 
 Recent advances in the wireless community make it possible to get the sampled version of CFR from commercial-off-the-shelf (COTS) Wi-Fi NICs. The extracted CFR are often refered to as a series of complex numbers, which depicts the amplitude and phase of each subcarrier:
 
 $$
-H(f_j)=\lVert H(f_j) \rVert e^{\angle H(f_j)} \tag{7}
+H(f_j)=\lVert H(f_j) \rVert e^{\angle H(f_j)}, (7)
 $$
 
-where $H(f\_j)$ is a sample at the $j^{th}$ subcarrier, with $\angle H(f\_k)$ denotes its phase. Most research paper treat the CFR at sampled at different subcarriers as the CSI data, which can be written as $\bm{H} = \left{ H(f\_j) \ \vert \ j \in \[1, J], j \in \mathbb{N} \right}$, where $J$ denotes the total number of subcarriers.
+where $$H(f_j)$$ is a sample at the $$j^{th}$$ subcarrier, with $$\angle H(f_k)$$ denotes its phase. Most research paper treat the CFR at sampled at different subcarriers as the CSI data, which can be written as $$\boldsymbol{H} = \{ H(f_j) \ \vert \ j \in [1, J], j \in \mathbb{N} \}$$, where $$J$$ denotes the total number of subcarriers.
 
 The ray-tracing model establishes the relationship between geometric properties of the signal propagation space and the CSI data. Theoretically, by analyzing the multipath signal, various types of geometric information (e.g., the propagation distance, the reflection points) can be derived. Therefore, the ray-tracing model is widely adopted in wireless localization and tracking tasks. In addition, many wireless detection and sensing systems also extract geometric features based on the ray-tracing models, and further put them into machine learning models for regression or classification.
 
@@ -79,28 +79,28 @@ The above-mentioned ray-tracing model characterizes signals with multiple propag
 The CSI data reported by commodity Wi-Fi NIC can be modeled as:
 
 $$
-H(f,t) = \sum_{n=1}^{N}{\alpha_n(f,t)e^{-j\phi_n(f, t)}}, \tag{8}
+H(f,t) = \sum_{n=1}^{N}{\alpha_n(f,t)e^{-j\phi_n(f, t)}}, (8)
 $$
 
-where $N$ is the total number of reflection paths, $\alpha\_n$ is the amplitude attenuation of path $n$, $\phi\_n$ is the corresponding phase.
+where $$N$$ is the total number of reflection paths, $$\alpha_n$$ is the amplitude attenuation of path $$n$$, $$\phi_n$$ is the corresponding phase.
 
-&#x20;\*\* Fig. 3. Wi-Fi signals in rich-scattering environment. \*\*
+<figure><img src=".gitbook/assets/wispeed_model.png" alt=""><figcaption><p>Fig. 3. Wi-Fi signals in rich-scattering environment.</p></figcaption></figure>
 
 As shown in Figure. 3, the scattering model treats all the objects in indoor environments as \textit{scatterers} that diffuse the signals to all directions. The CSI observed by the receiver is added up with the portions contributed by the static (furniture, walls, etc.) and dynamic (arms, legs, etc.) scatterers. Intuitively, each scatter is deemed as a virtual Tx. Such modeling can be applied to typical indoor scenarios, where the rooms are crowded with furniture, and signals could propagate in almost all directions. On this basis, we can dismiss the specific signal propagation path and only statistically investigate the relationship between the observed CSI and the moving speed.
 
 We decompose the observed CSI into the portions contributed by individual scatterers:
 
 $$
-\tag{9} H(f,t) = \sum_{o \in \Omega_s(t)}{H_o(f,t)} + \sum_{p \in \Omega_d(t)}{H_p(f,t)},
+H(f,t) = \sum_{o \in \Omega_s(t)}{H_o(f,t)} + \sum_{p \in \Omega_d(t)}{H_p(f,t)}, (9)
 $$
 
-where $\Omega\_s(t)$ and $\Omega\_d(t)$ are the sets of static and dynamic scatterers, $H\_p(f,t)$ is the portion of observed CSI contributed by $p^{th}$ dynamic scatterer. For each scatterer, the diffused components undergo anonymous propagation processes and eventually add up at the receiver. Try to a three-dimensional coordinate with its origin at the $p^{th}$ scatterer and its z-axis align with the scatterer's moving direction, the representation of $H\_p(f,t)$ is further decomposed as follows :
+where $$\Omega_s(t)$$ and $$\Omega_d(t)$$ are the sets of static and dynamic scatterers, $$H_p(f,t)$$ is the portion of observed CSI contributed by $$p^{th}$$ dynamic scatterer. For each scatterer, the diffused components undergo anonymous propagation processes and eventually add up at the receiver. Try to a three-dimensional coordinate with its origin at the $$p^{th}$$ scatterer and its z-axis align with the scatterer's moving direction, the representation of $$H_p(f,t)$$ is further decomposed as follows :
 
 $$
-\tag{10} H_p(f,t) = \int_{0}^{2\pi}\int_{0}^{\pi}{h_p(\alpha,\beta,f,t)\exp(-jkv_p\cos(\alpha)t)\mathrm{d} \alpha \mathrm{d} \beta},
+H_p(f,t) = \int_{0}^{2\pi}\int_{0}^{\pi}{h_p(\alpha,\beta,f,t)\exp(-jkv_p\cos(\alpha)t)\mathrm{d} \alpha \mathrm{d} \beta}, (10)
 $$
 
-where $k=2\pi/\lambda$ and $\lambda$ is the signal wavelength, $v\_p$ is the speed of the $p^{th}$ dynamic scatterer, $\alpha$ and $\beta$ are the azimuth and elevation angles, $\exp(-jkv\_i\cos(\alpha)t)$ represents the phase shift of the signal on direction $(\alpha,\beta)$. $h\_p(\alpha,\beta,f,t)$ is the portion of observed CSI contributed by $p^{th}$ scatterer on direction $(\alpha,\beta)$. Inherited from the physical properties of EM waves \[^6], $h\_p(\alpha,\beta,f,t)$ can be viewed as a circularly-symmetric Gaussian random variable. For $\forall p, q \in \Omega\_d$ and $(\alpha\_1,\beta\_1) \neq (\alpha\_2,\beta\_2)$, $h\_p(\alpha\_1,\beta\_1,f,t)$ is independent of $h\_q(\alpha\_2,\beta\_2,f,t)$.
+where $$k=2\pi/\lambda$$ and $$\lambda$$ is the signal wavelength, $$v_p$$ is the speed of the $$p^{th}$$ dynamic scatterer, $$\alpha$$ and $$\beta$$ are the azimuth and elevation angles, $$\exp(-jkv_i\cos(\alpha)t)$$ represents the phase shift of the signal on direction $$(\alpha,\beta)$$. $$h_p(\alpha,\beta,f,t)$$ is the portion of observed CSI contributed by $$p^{th}$$ scatterer on direction $(\alpha,\beta)$. Inherited from the physical properties of EM waves \[^6], $h\_p(\alpha,\beta,f,t)$ can be viewed as a circularly-symmetric Gaussian random variable. For $\forall p, q \in \Omega\_d$ and $(\alpha\_1,\beta\_1) \neq (\alpha\_2,\beta\_2)$, $h\_p(\alpha\_1,\beta\_1,f,t)$ is independent of $h\_q(\alpha\_2,\beta\_2,f,t)$.
 
 Based on Eqn.9 and Eqn.10, we are able to derive the statistical property by analyzing the autocorrelation function (ACF) of $H(f,t)$ \[^6]:
 

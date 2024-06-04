@@ -6,7 +6,7 @@ It enables a wide range of applications, such as `🖐🏻 gesture recognition` 
 
 Compared with other sensing paradigms, such as `📷 vision-based sensing`, wireless sensing solutions have unique advantages such as high coverage, pervasiveness, low cost, and robustness under adverse light and texture scenarios. Besides, wireless sensing solutions are generally lightweight in terms of both computation overhead and device size.
 
-This tutorial takes Wi-Fi sensing as an example. It introduces both the **theoretical principles** and the **code implementation** for building a wireless sensing system, including data collection, signal processing, features extraction, and model design. In addition, this tutorial highlights state-of-the-art **deep learning models** (e.g., CNN, RNN, and adversarial learning models) and their applications in wireless sensing systems.
+This tutorial takes Wi-Fi sensing as an example. It introduces both the **theoretical principles** and the **code implementation** for building a wireless sensing system, including data collection, signal processing, features extraction, and model design. In addition, this tutorial highlights state-of-the-art **deep learning models** (e.g., CNN, Transformer, complex-valued neural networks) and their applications in wireless sensing systems.
 
 We believe this tutorial will help people in other research fields break into wireless sensing research and learn more about its theories, designs, and implementation skills, promoting prosperity in the field of wireless sensing.
 
