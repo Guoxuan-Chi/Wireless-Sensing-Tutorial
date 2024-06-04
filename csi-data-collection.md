@@ -4,7 +4,7 @@ CSI data collection is the first step toward the implementation of a practical w
 
 ## Widar3.0 Dataset
 
-Open datasets are essential to provide comprehensive knowledge for model training and a unified benchmark for model comparison. Open datasets are even more necessary in the wireless sensing field because RF signals are more sensitive to devices and deployment environments. However, the absence of high-quality and large-scale datasets has become the bottleneck that hindered the progress of wireless sensing technology. Existing wireless sensing datasets suffer from small scales and limited scenarios in 2019 when we started to build the Widar3 dataset. Widar3[^1] is a wireless sensing dataset for human activity recognition. It is collected from commodity Wi-Fi NICs in the form of RSSI and CSI. It consists of 258,000 instances of hand gestures with a duration of 8,620 minutes and from 75 domains. Widar3 is so far the largest and most comprehensive dataset in this field and receives widespread attention from researchers all over the world. Widar3 dataset is publicly available at IEEE DataPort (official data repository) and continues evolving to contain more types of activities.
+Open datasets are essential to provide comprehensive knowledge for model training and a unified benchmark for model comparison. Open datasets are even more necessary in the wireless sensing field because RF signals are more sensitive to devices and deployment environments. However, the absence of high-quality and large-scale datasets has become the bottleneck that hindered the progress of wireless sensing technology. Existing wireless sensing datasets suffer from small scales and limited scenarios in 2019 when we started to build the Widar3 dataset. Widar3.0[^1] is a wireless sensing dataset for human activity recognition. It is collected from commodity Wi-Fi NICs in the form of RSSI and CSI. It consists of 258,000 instances of hand gestures with a duration of 8,620 minutes and from 75 domains. Widar3 is so far the largest and most comprehensive dataset in this field and receives widespread attention from researchers all over the world. Widar3 dataset is publicly available at IEEE DataPort (official data repository) and continues evolving to contain more types of activities.
 
 ## PicoScenes Platform
 
@@ -20,7 +20,7 @@ The homepage[^2] of this tool can be accessed for more detailed information.
 
 This CSI Tool is built upon the Intel WiFi Wireless Link 5300 802.11n MIMO radios, using a modified firmware and the open-source Linux wireless driver. It includes all the software and scripts required to collect, read, and parse CSI.
 
-The IWL5300 provides 802.11n CSI of 30 subcarrier groups. Each group contains 2 adjacent subcarriers given 20 MHz bandwidth or 4 given 40 MHz bandwidth. Each CSI sample is a complex number, with a signed 8-bit resolution for both real and imaginary parts. One CSI record is a $A \times 30$ matrix, where $M$ is the number of pairs of transmitting and receiving antennas.
+The IWL5300 provides 802.11n CSI of 30 subcarrier groups. Each group contains 2 adjacent subcarriers given 20 MHz bandwidth or 4 given 40 MHz bandwidth. Each CSI sample is a complex number, with a signed 8-bit resolution for both real and imaginary parts. One CSI record is a $$A \times 30$$ matrix, where $$M$$ is the number of pairs of transmitting and receiving antennas.
 
 The homepage[^3] of this tool can be accessed for detailed information.
 
@@ -28,23 +28,23 @@ The homepage[^3] of this tool can be accessed for detailed information.
 
 Atheros CSI Tool is an open-source 802.11n measurement and experimentation tool. It enables the extraction of detailed PHY wireless communication information from the Atheros WiFi NICs, including the Channel State Information (CSI), the received packet payload, and other information (the time stamp, the RSSI of each antenna, the data rate, \etc). Atheros-CSI-Tool is built on top of ath9k, an open-source Linux kernel driver supporting Atheros 802.11n PCI/PCI-E chips. Thus, this tool theoretically supports all types of Atheros 802.11n WiFi chipsets. We have tested it on Atheros AR9580, AR9590, AR9344, and QCA9558. Furthermore, Atheros CSI Tool is open source, and all functionalities are implemented in software without any modification to the firmware. Therefore, one can extend the functionalities of Atheros CSI Tool with their own codes under the GPL license.
 
-Atheros-CSI-Tool works on various Linux distributions, \eg, Ubuntu, OpenWRT, Linino, \etc. Different Linux distribution works with different hardware. Ubuntu works for personal computers like laptops or desktops. OpenWRT works for embedded devices such as WiFi routers. Linino works for IoT devices, such as Arduino YUN. The official website provides the source code for the Ubuntu version and OpenWRT version of the Atheros CSI tool.
+Atheros-CSI-Tool works on various Linux distributions, \eg, Ubuntu, OpenWRT, Linino, etc. Different Linux distribution works with different hardware. Ubuntu works for personal computers like laptops or desktops. OpenWRT works for embedded devices such as WiFi routers. Linino works for IoT devices, such as Arduino YUN. The official website provides the source code for the Ubuntu version and OpenWRT version of the Atheros CSI tool.
 
 The homepage[^4] of this tool can be accessed for detailed information.
 
 ## Wireless Sensing Simulator
 
-The Wireless Sensing Simulator is a CSI simulator developed by the MobiSense group at Tsinghua University. It is developed with Matlab for researchers to cost-effectively and quickly create CSI datasets for testing.\
-Wireless Sensing Simulator can simulate the CSI data of any protocol under the 802.11 protocol family, and it can even simulate the CSI data of a cellular network with freely set variables such as bandwidth, center frequency, number of subcarriers, number of antennas, and so on. In Wireless Sensing Simulator, we can use our own modeled 3D scene to complete the simulation, where the location, orientation, and number of access points (APs) and Internet of Things (IoT) devices are modifiable. The simulation is realized based on the ray tracing model, and the real geometrical information (e.g., AoA, AoD, and ToF) of all multipath signals between AP and IoT devices will be available. We integrate the traditional AoA, ToF, and Doppler spectrum estimation algorithms, which will be described in detail in the CSI Feature Extraction chapter.\
-We have verified the effectiveness of this tool in our recent paper Wi-Prox \[9]. Furthermore, Wireless Sensing Simulator has been open-sourced, and all functions are implemented in software. Therefore, one can extend the functionalities of Wireless Sensing Simulator with their own codes under the GPL license.\
-The homepage[^5] of this tool can be accessed for detailed information.
+The Wireless Sensing Simulator is a CSI simulator developed by the MobiSense group at Tsinghua University. It is developed with Matlab for researchers to cost-effectively and quickly create CSI datasets for testing.
+
+Wireless Sensing Simulator can simulate the CSI data of any protocol under the 802.11 protocol family, and it can even simulate the CSI data of a cellular network with freely set variables such as bandwidth, center frequency, number of subcarriers, number of antennas, and so on. In Wireless Sensing Simulator, we can use our own modeled 3D scene to complete the simulation, where the location, orientation, and number of access points (APs) and Internet of Things (IoT) devices are modifiable. The simulation is realized based on the ray tracing model, and the real geometrical information (e.g., AoA, AoD, and ToF) of all multipath signals between AP and IoT devices will be available. We integrate the traditional AoA, ToF, and Doppler spectrum estimation algorithms, which will be described in detail in the CSI Feature Extraction chapter.
+
+We have verified the effectiveness of this tool in our recent paper Wi-Prox \[^1]. Furthermore, Wireless Sensing Simulator has been open-sourced, and all functions are implemented in software. Therefore, one can extend the functionalities of Wireless Sensing Simulator with their own codes under the GPL license.
+
+The repo[^5] of this tool can be accessed for detailed information.
 
 
 
-
-
-\
-
+\[^1]: Gao, Yuchong, et al. "Wi-Prox: Proximity Estimation of Non-Directly Connected Devices via Sim2Real Transfer Learning." GLOBECOM 2023-2023 IEEE Global Communications Conference. IEEE, 2023.
 
 [^1]: [Widar3 Dataset](http://tns.thss.tsinghua.edu.cn/widar3.0)
 
