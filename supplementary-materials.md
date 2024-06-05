@@ -7,7 +7,7 @@ This project is currently developed and maintained by the Tsinghua **MobiSense G
 {% hint style="info" %}
 We warmly invite all colleagues who are interested in wireless sensing to contribute to our tutorial.
 
-&#x20;If you're interested in becoming a more involved collaborator, please contact the authors to apply for Team Member status. Alternatively, for minor contributions, you can directly make changes by clicking on **Edit on GitHub** on the right side of the page and submitting a pull request.&#x20;
+&#x20;If you're interested in becoming a more involved collaborator, please contact the authors to apply for Team Member status. Alternatively, you can directly make changes by clicking on **Edit on GitHub** on the right side of the page and submitting a pull request.&#x20;
 
 We look forward to your valuable contributions to enhance this resource**😄**
 {% endhint %}
@@ -42,9 +42,9 @@ To provide a solid foundation for those new to the field of wireless sensing, we
 
 *   [**Zheng Yang**](http://tns.thss.tsinghua.edu.cn/\~yangzheng/) is an associate professor in School of Software and BNRist, Tsinghua University, Beijing, China. He is the leader of the MobiSense Group.
 
-    Zheng Yang was nominated as the IEEE Fellow in 2022, his research interests include Internet of Things, industrial networks, wireless sensing and localization, etc. He is an author and co-author of 4 books and over 60 research papers in premier journals and conferences. He received 4 best paper (candidates) awards and has over 10,000 citations with H-index 59.
-* [​](http://tns.thss.tsinghua.edu.cn/wst/authors#yi-zhang)[**Yi Zhang**](https://scholar.google.com/citations?hl=zh-CN\&user=oJLECGMAAAAJ) recieved his PhD. degree in 2022, under supervision of Prof. Zheng Yang. His research interests include human-centric wireless sensing with Wi-Fi and mmWave Radar.
+    Zheng Yang was nominated as the IEEE Fellow in 2022, his research interests include Internet of Things, industrial networks, wireless sensing and localization, etc. He is an author and co-author of 4 books and over 60 research papers in premier journals and conferences. He received 4 best paper (candidates) awards and has over 10,000 citations with H-index 60.
 * [​](http://tns.thss.tsinghua.edu.cn/wst/authors#guoxuan-chi)[**Guoxuan Chi**](https://scholar.google.com/citations?hl=zh-CN\&user=RkTfnqcAAAAJ) recieved his PhD. degree in 2024, under supervision of Prof. Zheng Yang. He is currently a research assistant at Tsinghua University. His research interests include wireless AI and integrated sensing and communication (ISAC).
+* [​](http://tns.thss.tsinghua.edu.cn/wst/authors#yi-zhang)[**Yi Zhang**](https://scholar.google.com/citations?hl=zh-CN\&user=oJLECGMAAAAJ) recieved his PhD. degree in 2022, under supervision of Prof. Zheng Yang. His research interests include human-centric wireless sensing with Wi-Fi and mmWave Radar.
 * **Guidong Zhang** recieved his PhD. degree in 2023 in Tsinghua University, under supervision of Prof. Zheng Yang. His research interests include wireless sensing with Wi-Fi and mmWave Radar.
 
 

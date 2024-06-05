@@ -112,10 +112,10 @@ disp("Intrusion detection result with SFO/PDD removal: " + num2str(intrusion_fla
 
 ## Nonlinear Amplitude and Phase
 
-The nonlinear amplitude and phase errors are caused by the imperfect analog domain filter implementation inside the hardware. Specifically, it causes the extracted CSI amplitude and phase to be equivalently processed by a nonlinear function. Let $f(\cdot)$ and $g(\cdot)$ be the nonlinear modes of CSI amplitude and phase, respectively, the errorous CSI can be written as:
+The nonlinear amplitude and phase errors are caused by the imperfect analog domain filter implementation inside the hardware. Specifically, it causes the extracted CSI amplitude and phase to be equivalently processed by a nonlinear function. Let $$f(\cdot)$$ and $$g(\cdot)$$ be the nonlinear modes of CSI amplitude and phase, respectively, the errorous CSI can be written as:
 
 $$
-\tag{29} \tilde{H}(i,j,k) = \sum_{n = 1}^{N} {f(\alpha_{n}) e^{-jg(\phi_{n}(i,j,k))}} + N(i,j,k).
+\tilde{H}(i,j,k) = \sum_{n = 1}^{N} {f(\alpha_{n}) e^{-jg(\phi_{n}(i,j,k))}} + N(i,j,k). (29)
 $$
 
 Specifically, during the OFDM modulation process, each subcarrier of should have the same gain. In other words, the amplitude-frequency characteristic of CSI should be a horizontal straight line when a coaxial cable is used to connect the transceiver ports. However, actual measurements show that even without the multipath radio channel, there is still a similar "frequency selective fading" characteristic, \ie, the gain of each frequency band is different, showing an M-shaped amplitude-frequency characteristic curve. Similarly, when using a coaxial cable to connect the transceiver port, the CSI phase-frequency characteristics obtained by the NIC are not an ideal straight line with slope, but an S-shaped curve with certain nonlinearity.
@@ -123,7 +123,7 @@ Specifically, during the OFDM modulation process, each subcarrier of should have
 After extensive research and experiments, we have observed two facts.
 
 * First, for a specific type of NIC, the nonlinear amplitude/phase error of CSI is fixed. This means that the correction task can be accomplished if we use a known length coaxial cable connected to the transceiver port. Before performing the sensing task, measure a representative set of CSI amplitude and phase, record the nonlinear characteristics, and eliminate the nonlinearity in the subsequent steps.
-* Second, we observe that the middle part of the subcarrier is free of nonlinear errors, and the nonlinear characteristics of both sides are also fixed. \end{itemize}
+* Second, we observe that the middle part of the subcarrier is free of nonlinear errors, and the nonlinear characteristics of both sides are also fixed.&#x20;
 
 Therefore, the function below the code performs the following steps to tackle the CSI nonlinearity:
 
@@ -132,7 +132,7 @@ Therefore, the function below the code performs the following steps to tackle th
 * Normalize its amplitude and record it as the amplitude template.
 * Unwrap the phases, then perform a linear fit to the middle part of its subcarriers. Subtract the linear fit result to obtain the nonlinear phase error template.
 
-Finally, the nonlinear amplitude and nonlinear phase components are saved in the form of $\alpha e^{j\phi}$, which indicates the nonlinear error template of a specific type of NIC.
+Finally, the nonlinear amplitude and nonlinear phase components are saved in the form of $$\alpha e^{j\phi}$$, which indicates the nonlinear error template of a specific type of NIC.
 
 ```c
 function [csi_calib_template] = set_template(csi_calib, linear_interval, calib_template_name)
@@ -186,10 +186,10 @@ end
 
 ## Automatic Gain Control Uncertainty
 
-Automatic gain control (AGC) induces a random gain $\beta$ in each received CSI packet.
+Automatic gain control (AGC) induces a random gain $$\beta$$ in each received CSI packet.
 
 $$
-\tag{30} \tilde{H}(i,j,k) = \sum_{n = 1}^{N} {\beta_{i} \alpha_{n} e^{-j\phi_{n}(i,j,k)}} + N(i,j,k).
+\tilde{H}(i,j,k) = \sum_{n = 1}^{N} {\beta_{i} \alpha_{n} e^{-j\phi_{n}(i,j,k)}} + N(i,j,k). (30)
 $$
 
 There are two ways to eliminate the AGC error: 1) Disable the AGC function of the wireless driver; 2) Compensate the amplitude of the measured CSI based on the reported AGC.
@@ -210,10 +210,10 @@ end
 
 ## Radio Chain Offset
 
-Radio chain offset (RCO) is the random phase variation $\epsilon\_{\phi}$ introduced between different Tx/Rx chains (transceiver antenna pairs). The RCO is reset each time the NIC is powered up.
+Radio chain offset (RCO) is the random phase variation $$\epsilon_{\phi}$$ introduced between different Tx/Rx chains (transceiver antenna pairs). The RCO is reset each time the NIC is powered up.
 
 $$
-\tag{31} \tilde{\phi}_{n}(i,j,k) = 2\pi(f_c + \Delta f_j + f_{D}) \tau_n(i, j, k) + \epsilon_{\phi},
+\tilde{\phi}_{n}(i,j,k) = 2\pi(f_c + \Delta f_j + f_{D}) \tau_n(i, j, k) + \epsilon_{\phi}, (31)
 $$
 
 RCO induces a biast of the phase-frequency characteristic curve. It undermines the accuracy of features such as AoA or ToF. Fortunately, we found that this type of phase deviation is consistent between each successive packet sent and therefore doesn't affect the performance of temporal tracking or sensing, and that this type of error can be eliminated by the following steps:
@@ -241,15 +241,15 @@ end
 
 ## Central Frequency Offset
 
-Central frequency offset (CFO), which is caused by the frequency desynchronization on both sides of the transceiver, leads to random frequency shift $ \epsilon\_{f}$ of each received CSI.
+Central frequency offset (CFO), which is caused by the frequency desynchronization on both sides of the transceiver, leads to random frequency shift $$\epsilon_{f}$$ of each received CSI.
 
 $$
-\tag{32} \tilde{\phi}_{n}(i,j,k) = 2\pi(f_c + \Delta f_j + f_{D} + \epsilon_{f}) \tau_n(i, j, k) = \phi_{n}(i,j,k) + \epsilon_{f}\tau_n(i, j, k).
+\tilde{\phi}_{n}(i,j,k) = 2\pi(f_c + \Delta f_j + f_{D} + \epsilon_{f}) \tau_n(i, j, k) = \phi_{n}(i,j,k) + \epsilon_{f}\tau_n(i, j, k). (32)
 $$
 
-The CFO induces an extra bias (\ie, an overall up and down shift) of the phase-frequency characteristic curve.
+The CFO induces an extra bias (i.e., an overall up and down shift) of the phase-frequency characteristic curve.
 
-To eliminate CFO, we need to insert multiple HT-LTFs in the same PPDU (Wi-Fi data frame), and therefore obtaining multiple CSI measurements. Since the time interval between multiple HT-LTFs is strictly controlled to $4 \mu s$ according to the 802.11 protocol, the phase difference between two HT-LTFs is induced by the CFO within $\Delta t = 4\mu s$. Thus, the approximate value of the CFO can be recovered.
+To eliminate CFO, we need to insert multiple HT-LTFs in the same PPDU (Wi-Fi data frame), and therefore obtaining multiple CSI measurements. Since the time interval between multiple HT-LTFs is strictly controlled to $$4 \mu s$$ according to the 802.11 protocol, the phase difference between two HT-LTFs is induced by the CFO within $$\Delta t = 4\mu s$$. Thus, the approximate value of the CFO can be recovered.
 
 ```c
 function [est_cfo] = cfo_calib(csi_src)
@@ -272,12 +272,12 @@ end
 The sampling frequency offset (SFO), which appears to be an error in frequency domain, are generally considered as an equivalent time shift due to frequency asynchrony. The packet detection delay (PDD) is a time delay. Therefore, despite their distinct causes, they are often discussed together as a "time offset" together.
 
 $$
-\tag{33} \tilde{\phi}_{n}(i,j,k) = 2\pi(f_c + \Delta f_j + f_{D}) (\tau_n(i, j, k) + \epsilon_{t}) = \phi_{n}(i,j,k) + 2\pi(f_c + \Delta f_j + f_{D}) \epsilon_{t}.
+\tilde{\phi}_{n}(i,j,k) = 2\pi(f_c + \Delta f_j + f_{D}) (\tau_n(i, j, k) + \epsilon_{t}) = \phi_{n}(i,j,k) + 2\pi(f_c + \Delta f_j + f_{D}) \epsilon_{t}. (33)
 $$
 
-This type of error is critical because the time delay can be confused with real ToF and thus affect the accuracy of the ranging accuarcy. Specifically, this deviation will be characterized in the phase-frequency characteristic curve as a change in slope, since this time deviation causes different phase changes with different sub-bands $\Delta f\_j$.
+This type of error is critical because the time delay can be confused with real ToF and thus affect the accuracy of the ranging accuarcy. Specifically, this deviation will be characterized in the phase-frequency characteristic curve as a change in slope, since this time deviation causes different phase changes with different sub-bands $$\Delta f_j$$.
 
-Currently, there is no "perfect algorithm" to solve this type of error. Conjugate multiplication and division are the only two methods to eliminate the SFO and PDD. The code of both of them are listed below. By appling the conjugate multiplication or division, the $\epsilon\_{t}$ is eliminated, at the cost of losing absolute ToF measurement.
+Currently, there is no "perfect algorithm" to solve this type of error. Conjugate multiplication and division are the only two methods to eliminate the SFO and PDD. The code of both of them are listed below. By appling the conjugate multiplication or division, the $$\epsilon_{t}$$ is eliminated, at the cost of losing absolute ToF measurement.
 
 ```c
 function [csi_remove_sto] = sto_calib_mul(csi_src)
@@ -316,5 +316,5 @@ end
 To sum up, there are various forms of errors in Wi-Fi CSI measurements, including fixed bias and random errors. Each of them have different impacts on the localization, tracking, and sensing tasks. The erroneous CSI form can be finally written as:
 
 $$
-\tag{34} \tilde{H}(i,j,k) = \sum_{n = 1}^{N} {\beta_{i}f(\alpha_{n}) e^{-jg(\phi_{n}(i,j,k))}} + N(i,j,k), \\ \tilde{\phi}_{n}(i,j,k) = 2\pi(f_c + \Delta f_j + f_{D} + \epsilon_{f}) (\tau_n(i, j, k) + \epsilon_{t}) + \epsilon_{\phi}.
+\tilde{H}(i,j,k) = \sum_{n = 1}^{N} {\beta_{i}f(\alpha_{n}) e^{-jg(\phi_{n}(i,j,k))}} + N(i,j,k), \\ \tilde{\phi}_{n}(i,j,k) = 2\pi(f_c + \Delta f_j + f_{D} + \epsilon_{f}) (\tau_n(i, j, k) + \epsilon_{t}) + \epsilon_{\phi}. (34)
 $$

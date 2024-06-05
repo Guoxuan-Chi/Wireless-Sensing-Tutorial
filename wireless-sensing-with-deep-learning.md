@@ -8,13 +8,13 @@ This section introduces a series of learning algorithms, especially the prevalen
 
 This section will present a working example to demonstrate how to apply different types of complex-valued neural networks for wireless sensing. Besides, we also provide a traditional real-valued CNN for DFS classification.
 
-Specifically, we use commodity Wi-Fi to recognize six human gestures. The gestures are illustrated in Figure. 9. We deploy a Wi-Fi transmitter and six receivers in a typical classroom, and the device setup is sketched in Figure. 10. The users are asked to perform gestures at the five marked locations and to five orientations. The data samples can be found in our widar3.0 dataset .&#x20;
+Specifically, we use commodity Wi-Fi to recognize six human gestures. The gestures are illustrated in Figure 12. We deploy a Wi-Fi transmitter and six receivers in a typical classroom, and the device setup is sketched in Figure 13. The users are asked to perform gestures at the five marked locations and to five orientations. The data samples can be found in our widar3.0 dataset .&#x20;
 
 
 
-<figure><img src=".gitbook/assets/gestures.png" alt=""><figcaption><p>Fig. 9. Sketches of gestures evaluated in the experiment.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/gestures.png" alt=""><figcaption><p>Fig. 12. Sketches of gestures evaluated in the experiment.</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/floor_plan.png" alt=""><figcaption><p>Fig. 10. The setup of Wi-Fi devices for gesture recognition task.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/floor_plan.png" alt=""><figcaption><p>Fig. 13. The setup of Wi-Fi devices for gesture recognition task.</p></figcaption></figure>
 
 ## Data Preperation
 
@@ -39,7 +39,7 @@ from scipy.io import loadmat
 class TrainDataset(Dataset):
     def __init__(self, transform=None):
         super().__init__()
-        self.path_log = "./csi/shuffle.txt"
+        self.path_log = "./CVNN/shuffle.txt"
         # In shuffle.txt, the first 90% are for training, the last 10% are for testing
         self.path_list = []
         with open(self.path_log, 'r') as txt:
@@ -95,7 +95,7 @@ Similarly, we have implemented the `TestDataset` class, which is almost identica
 class TestDataset(Dataset):
     def __init__(self, transform=None):
         super().__init__()
-        self.path_log = "./csi/shuffle.txt"
+        self.path_log = "./CVNN/shuffle.txt"
         # In shuffle.txt, the first 90% are for training, the last 10% are for testing
         self.path_list = []
         with open(self.path_log, 'r') as txt:
@@ -218,9 +218,9 @@ To facilitate comparison, we also provide a conventional real-valued CNN+RNN arc
 
 Complex-valued neural networks, compared to traditional real-valued neural networks, are better suited to the data type of Channel State Information (CSI). Real and complex neurons exhibit significant differences. As shown in the figure below, complex neurons can effectively combine information from both the real and imaginary parts, often resulting in superior performance. This ability to handle complex numbers inherently aligns with the nature of CSI data, which includes both amplitude and phase information, enabling more nuanced and effective processing of wireless signal characteristics.
 
-<figure><img src=".gitbook/assets/FC_real.png" alt=""><figcaption><p>Fig. Real-valued neurons.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/FC_real.png" alt=""><figcaption><p>Fig. 14. Real-valued neurons.</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/FC_complex.png" alt=""><figcaption><p>Fig. Complex-valued nerons.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/FC_complex.png" alt=""><figcaption><p>Fig. 15. Complex-valued nerons.</p></figcaption></figure>
 
 #### 1. AlexNet
 
@@ -483,9 +483,9 @@ This part introduces a series of real-valued learning algorithms, especially the
 
 #### 1. Real-valued CNN
 
-Convolutional Neural Network (CNN) contributes to the recent advances in understanding images, videos, and audios. Some works have exploited CNN for wireless signal understanding in wireless sensing tasks and achieved promising performance. This part will present a working example to demonstrate how to apply CNN for wireless sensing. The data samples can be found in our released dataset. We extract DFS from raw CSI signals and feed them into a CNN network. The network architecture is shown in Figure. 11.
+Convolutional Neural Network (CNN) contributes to the recent advances in understanding images, videos, and audios. Some works have exploited CNN for wireless signal understanding in wireless sensing tasks and achieved promising performance. This part will present a working example to demonstrate how to apply CNN for wireless sensing. The data samples can be found in our released dataset. We extract DFS from raw CSI signals and feed them into a CNN network. The network architecture is shown in Figure 16.
 
-<figure><img src=".gitbook/assets/DNN_Arch_CNN.png" alt=""><figcaption><p>Real-valued CNN Architecture</p></figcaption></figure>
+<figure><img src=".gitbook/assets/DNN_Arch_CNN.png" alt=""><figcaption><p>Fig. 16. Real-valued CNN architecture.</p></figcaption></figure>
 
 We now introduce the implementation code in detail.
 
@@ -505,7 +505,7 @@ from keras.backend.tensorflow_backend import set_session
 from sklearn.model_selection import train_test_split
 ```
 
-Then we define some parameters, including the hyperparameters and the data path. The fraction of testing data is defined as 0.1. To simplify the problem, we only use six gesture types in the widar3.0 dataset.
+Then we define some parameters, including the hyperparameters and the data path. The fraction of testing data is defined as `0.1`. To simplify the problem, we only use six gesture types in the widar3.0 dataset.
 
 ```
 fraction_for_test = 0.1
@@ -535,7 +535,7 @@ print('\nTrain on ' + str(label_train.shape[0]) + ' samples\n' +\
 label_train = onehot_encoding(label_train, N_MOTION)
 </code></pre>
 
-After loading and formatting the training and testing data, we defined the model with the predefined function \lstinline{build\_model}. After that, we train the model by calling the API function \lstinline{fit}. The input data and label are specified in the parameters. The fraction of validation data is specified as 0.1.
+After loading and formatting the training and testing data, we defined the model with the predefined function `build_model`. After that, we train the model by calling the API function `fit`. The input data and label are specified in the parameters. The fraction of validation data is specified as `0.1`.
 
 ```python
 model = build_model(input_shape=(T_MAX, 6, 121, 1), n_class=N_MOTION)
@@ -620,7 +620,7 @@ def load_data(path_to_data):
     return data, label
 ```
 
-The `normalize_data` function is used to normalize the loaded data samples. Each data sample has a dimension of $\[6, 121, T]$, in which the number "6" represents the number of Wi-Fi receivers, the number "121" represents the frequency bins, and the "T" represents the time durations. To normalize a sample, we scale the data to be in the range of $\[0, 1]$ for each time snapshot.
+The `normalize_data` function is used to normalize the loaded data samples. Each data sample has a dimension of $$[6, 121, T]$$, in which the number `6` represents the number of Wi-Fi receivers, the number `121` represents the frequency bins, and the `T` represents the time durations. To normalize a sample, we scale the data to be in the range of $$[0, 1]$$ for each time snapshot.
 
 ```python
 def normalize_data(data_1):
@@ -674,13 +674,13 @@ def build_model(input_shape, n_class):
 
 #### 2. Real-valued RNN
 
-Recurrent Neural Network (RNN) is designed for modeling temporal dynamics of sequences and is commonly used for time series data analysis like speech recognition and natural language processing. Wireless signals are highly correlated over time and can be processed with RNN. Some workshave demonstrated the potential of RNN for wireless sensing tasks. In this section, we will present a working example of combining CNN and RNN to perform gesture recognition with Wi-Fi. The experimental settings are the same as in the previous part. We also extract DFS from the raw CSI as the input feature of the network. The network architecture is shown in Figure. 12.
+Recurrent Neural Network (RNN) is designed for modeling temporal dynamics of sequences and is commonly used for time series data analysis like speech recognition and natural language processing. Wireless signals are highly correlated over time and can be processed with RNN. Some workshave demonstrated the potential of RNN for wireless sensing tasks. In this section, we will present a working example of combining CNN and RNN to perform gesture recognition with Wi-Fi. The experimental settings are the same as in the previous part. We also extract DFS from the raw CSI as the input feature of the network. The network architecture is shown in Figure 17.
 
-<figure><img src=".gitbook/assets/DNN_Arch_CNNRNN.png" alt=""><figcaption><p>Real-valued RNN Architecture</p></figcaption></figure>
+<figure><img src=".gitbook/assets/DNN_Arch_CNNRNN.png" alt=""><figcaption><p>Fig. 17. Real-valued RNN architecture.</p></figcaption></figure>
 
 We now introduce the implementation code in detail.
 
-Most of the code is the same as in \sect{sec:cnn} except for the model definition. To define the model, we use two-dimensional convolutional layer and max-pooling layer on the dimensional except for the time dimension of the data. We adopt the GRU layer as the recurrent layer.
+Most of the code is the same as in [#id-1.-real-valued-cnn](wireless-sensing-with-deep-learning.md#id-1.-real-valued-cnn "mention") except for the model definition. To define the model, we use two-dimensional convolutional layer and max-pooling layer on the dimensional except for the time dimension of the data. We adopt the GRU layer as the recurrent layer.
 
 ```python
 def build_model(input_shape, n_class):
@@ -711,13 +711,13 @@ def build_model(input_shape, n_class):
 
 #### 3. Real-valued Adversarial Learning
 
-Except for the basic neural network components, some high-level network architectures also play essential roles in wireless sensing. Similar to computer vision tasks, wireless sensing also suffer from domain misalignment problem. Wireless signals can be reflected by the surrounding objects during propagation and will be flooded with target-irrelevant signal components. The sensing system trained in one deployment environment can hardly be applied directly in other settings without adaptation. Some works try to adopt adversarial learning techniques to tackle this problem and achieve promising performance. This section will give an example of how to apply this technique in wireless sensing tasks. Specifically, we build a gesture recognition system with Wi-Fi, similar to that in \sect{sec:cnn}. We try to achieve consistent performance across different human locations and orientations. The network architecture is shown in Figure. 13.
+Except for the basic neural network components, some high-level network architectures also play essential roles in wireless sensing. Similar to computer vision tasks, wireless sensing also suffer from domain misalignment problem. Wireless signals can be reflected by the surrounding objects during propagation and will be flooded with target-irrelevant signal components. The sensing system trained in one deployment environment can hardly be applied directly in other settings without adaptation. Some works try to adopt adversarial learning techniques to tackle this problem and achieve promising performance. This section will give an example of how to apply this technique in wireless sensing tasks. Specifically, we build a gesture recognition system with Wi-Fi, similar to that in [#id-1.-real-valued-cnn](wireless-sensing-with-deep-learning.md#id-1.-real-valued-cnn "mention"). We try to achieve consistent performance across different human locations and orientations. The network architecture is shown in Figure 18.
 
 We now introduce the implementation code in detail.
 
 
 
-<figure><img src=".gitbook/assets/DNN_Arch_Adv.png" alt=""><figcaption><p>Adversarial learning network architecture. </p></figcaption></figure>
+<figure><img src=".gitbook/assets/DNN_Arch_Adv.png" alt=""><figcaption><p>Fig. 18. Adversarial learning network architecture. </p></figcaption></figure>
 
 In the Widar3.0 dataset , we collect gesture data when the users stand at different locations. As discussed in [#phase-shift](csi-feature-extraction.md#phase-shift "mention"), human locations have significant impact on the DFS measurements. To mitigate this impact, we treat human locations as different domains and build an adversarial learning network to recognize gestures irrespective of domains. In the program, we first load data, labels, and domains from the dataset and split them into train and test. Both label and domain are encoded into the one-hot format.
 
@@ -769,7 +769,7 @@ test_accuracy = np.sum(label_test == label_test_pred) / (label_test.shape[0])
 print(test_accuracy)
 ```
 
-Different from that in \sect{sec:cnn}, we load data, label, and domain in the `load_data` function. The domain is defined as the location of the human, which is embedded in the file name.
+Different from that in [#id-1.-real-valued-cnn](wireless-sensing-with-deep-learning.md#id-1.-real-valued-cnn "mention"), we load data, label, and domain in the `load_data` function. The domain is defined as the location of the human, which is embedded in the file name.
 
 ```python
 def load_data(path_to_data):
@@ -814,7 +814,7 @@ def load_data(path_to_data):
     return data, label, domain
 ```
 
-To define the network, we use a CNN layer and an RNN layer as the feature extractor, which is similar to that in \sect{sec:rnn}. In the gesture recognizer and domain discriminator, we use two fully-connected layers and an output layer activated by `softmax` function, respectively. We use categorical cross-entropy loss for both label prediction and domain prediction outputs. The domain prediction loss is weighted with `loss_weight_domain` and subtracted from the label prediction loss.
+To define the network, we use a CNN layer and an RNN layer as the feature extractor, which is similar to that in [#id-2.-real-valued-rnn](wireless-sensing-with-deep-learning.md#id-2.-real-valued-rnn "mention"). In the gesture recognizer and domain discriminator, we use two fully-connected layers and an output layer activated by `softmax` function, respectively. We use categorical cross-entropy loss for both label prediction and domain prediction outputs. The domain prediction loss is weighted with `loss_weight_domain` and subtracted from the label prediction loss.
 
 ```python
 def build_model(input_shape, n_class, n_domain):
@@ -878,31 +878,27 @@ def custom_loss_domain():
 
 In this section, we will present a more complicated wireless sensing task with deep learning. Many wireless sensing approaches employ Fast Fourier Transform (FFT) on a time series of RF data to obtain time-frequency spectrograms of human activities. FFT suffers from errors due to an effect known as leakage, when the block of data is not periodic (the most common case in practice), which results in a smeared spectrum of the original signal and further leads to misleading data representation for learning-based sensing. Classical approaches reduce leakage by windowing, which cannot eliminate leakage entirely. Considering the significant fitting capability of deep neural networks, we can design a signal processing network to learn an optimal function to minimize or nearly eliminate the leakage and enhance the spectrums, which we call the Signal Enhancement Network (SEN).
 
-The signal processing network takes as input a spectrogram transformed from wireless signals via STFT, removes the spectral leakage in the spectrogram, and recovers the underlying actual frequency components. Figure. 17 shows the training process of the network. As shown in the upper part of Figure. 17, we randomly generate ideal spectrums with 1 to 5 frequency components, whose amplitudes, phases, and frequencies are uniformly drawn from their ranges of interest. Then, the ideal spectrum is converted to the leaked spectrum following the process in the following equation to simulate the windowing effect and random complex noises:
+The signal processing network takes as input a spectrogram transformed from wireless signals via STFT, removes the spectral leakage in the spectrogram, and recovers the underlying actual frequency components. Figure 20 shows the training process of the network. As shown in the upper part of Figure 20, we randomly generate ideal spectrums with 1 to 5 frequency components, whose amplitudes, phases, and frequencies are uniformly drawn from their ranges of interest. Then, the ideal spectrum is converted to the leaked spectrum following the process in the following equation to simulate the windowing effect and random complex noises:
 
 $$
-\tag{35} \hat{\mathbf{s}} = \mathbf{A}\mathbf{s}+\mathbf{n},
+\hat{\mathbf{s}} = \mathbf{A}\mathbf{s}+\mathbf{n}, (35)
 $$
 
-where $\mathbf{s}$ and $\hat{\mathbf{s\}}$ are the ideal and estimated frequency spectrum, respectively, $\mathbf{n}$ represents the additive Gaussian noise vector, and $\mathbf{A}$ is the convolution matrix of the windowing function in the frequency domain. The $i^{th}$ column of $\mathbf{A}$ is:
+where $$\mathbf{s}$$ and $$\hat{\mathbf{s}}$$ are the ideal and estimated frequency spectrum, respectively, $$\mathbf{n}$$ represents the additive Gaussian noise vector, and $$\mathbf{A}$$ is the convolution matrix of the windowing function in the frequency domain. The $$i^{th}$$ column of $$\mathbf{A}$$ is:
 
 $$
-\tag{36} \mathbf{A_{(:,i)}} = {\rm FFT}(\mathbf{\varpi}) * \delta(i).
+\mathbf{A_{(:,i)}} = {\rm FFT}(\mathbf{\varpi}) * \delta(i). (36)
 $$
 
-where $\mathbf{\varpi}$ represents the windowing function of FFT in time domain.
+where $$\mathbf{\varpi}$$ represents the windowing function of FFT in time domain.
 
-The amplitude of the noise follows a Gaussian distribution and its phase follows a uniform distribution in $\[0,2\pi]$. The network takes the leaked spectrum as input and outputs the enhanced spectrum close to the ideal one. Thus, we minimize the $L\_2$ loss $L=||{\rm SEN}(\hat{\mathbf{s\}})-\mathbf{s}||\_2$ during training. During inference, the spectrums measured from real-world scenarios are normalized to $\[0,1]$ and fed into the network to obtain the enhanced spectrum.
+The amplitude of the noise follows a Gaussian distribution and its phase follows a uniform distribution in $$[0,2\pi]$$. The network takes the leaked spectrum as input and outputs the enhanced spectrum close to the ideal one. Thus, we minimize the $$L_2$$ loss $$L=||{\rm SEN}(\hat{\mathbf{s}})-\mathbf{s}||_2$$ during training. During inference, the spectrums measured from real-world scenarios are normalized to $$[0,1]$$ and fed into the network to obtain the enhanced spectrum.
 
 We now present the implementation code in detail.
 
-&#x20;\*\* Fig. 14. Real-valued neurons. \*\*
+<figure><img src=".gitbook/assets/DNN_Arch_CVNN.png" alt=""><figcaption><p>Fig. 19. Complex-valued SEN architecture.</p></figcaption></figure>
 
-&#x20;\*\* Fig. 15. Complex-valued neurons. \*\*
-
-&#x20;\*\* Fig. 16. Complex-valued neural network architecture. \*\*
-
-&#x20;\*\* Fig. 17. The training process of the signal processing network. \*\*
+<figure><img src=".gitbook/assets/SEN_training.png" alt=""><figcaption><p>Fig. 20. The training process of the signal processing network. </p></figcaption></figure>
 
 Different from previous sections, we use the PyTorch platform to implement the network. PyTorch provides the interface to implement custom layers, which makes the implementation of the CVNN much more convenient. We first import some necessary packages as follows.
 
@@ -944,7 +940,7 @@ n_test_size = 200
 f_learning_rate = 0.001
 ```
 
-The program begins with the following code. We first generate the convolution matrix of the windowing function (Eqn.36) with the pre-defined function `generate_blur_matrix_complex`, which will be introduced shortly. Then we define the SEN model and move it to the GPU processor with the API function `cuda`. After the model definition, we train the model with synthetic spectrograms, during which process we save the trained model every 500 epochs. The trained and saved model can be directly loaded and used to enhance spectrograms.
+The program begins with the following code. We first generate the convolution matrix of the windowing function (Eqn. 36) with the pre-defined function `generate_blur_matrix_complex`, which will be introduced shortly. Then we define the SEN model and move it to the GPU processor with the API function `cuda`. After the model definition, we train the model with synthetic spectrograms, during which process we save the trained model every `500` epochs. The trained and saved model can be directly loaded and used to enhance spectrograms.
 
 ```python
 if __name__ == "__main__":
@@ -961,7 +957,7 @@ if __name__ == "__main__":
     train(model=model, blur_matrix_right=blur_matrix_right, feature_len=feature_len, n_epoch=n_epoch, n_itr_per_epoch=n_itr_per_epoch, n_batch_size=n_batch_size, optimizer=torch.optim.RMSprop(model.parameters(), lr=f_learning_rate))
 ```
 
-This `generate_blur_matrix_complex` function is used to generate the convolution matrix of the windowing function. The core idea behind this function is to enumerate all the frequencies, apply the window function on the sinusoid signal, and generate the corresponding spectrums with FFT. After obtaining the convolution matrix, we can bridge the gap between the ideal and the leaked spectrograms with Eqn.35. In other words, we can directly get the leaked spectrograms by multiplying the idea spectrograms with the convolution matrix.
+This `generate_blur_matrix_complex` function is used to generate the convolution matrix of the windowing function. The core idea behind this function is to enumerate all the frequencies, apply the window function on the sinusoid signal, and generate the corresponding spectrums with FFT. After obtaining the convolution matrix, we can bridge the gap between the ideal and the leaked spectrograms with Eqn. 35. In other words, we can directly get the leaked spectrograms by multiplying the idea spectrograms with the convolution matrix.
 
 ```python
 def generate_blur_matrix_complex(wind_type, wind_len=251, padded_len=1000, crop_len=121):
@@ -1019,7 +1015,7 @@ def generate_blur_matrix_complex(wind_type, wind_len=251, padded_len=1000, crop_
     return ret
 ```
 
-This function is to generate one batch of spectrograms in both the leaked form and the idea form. The process is the same as that illustrated in Eqn.35.
+This function is to generate one batch of spectrograms in both the leaked form and the idea form. The process is the same as that illustrated in Eqn. 35.
 
 ```python
 def syn_one_batch_complex(blur_matrix_right, feature_len, n_batch):
@@ -1070,7 +1066,7 @@ class SEN(nn.Module):
         return output
 ```
 
-This `m_Linear` class leverages the interface of PyTorch to define the customized complex-valued fully-connected layer, which is the implementation of the network structure illustrated in Figure. 14 and 15.
+This `m_Linear` class leverages the interface of PyTorch to define the customized complex-valued fully-connected layer, which is the implementation of the network structure illustrated in Figure 14 and 15.
 
 ```python
 class m_Linear(nn.Module):
@@ -1123,7 +1119,7 @@ def loss_function(x, y):
     return loss_recon
 ```
 
-In this `train` function, we implement the training process of SEN as that described in Figure. 17. In each epoch, we generate and train the network with multiple iterations. For each iteration, we generate a batch of synthetic spectrums in leaked format. Each leaked spectrum have an idea spectrum as the label.
+In this `train` function, we implement the training process of SEN as that described in Figure 20. In each epoch, we generate and train the network with multiple iterations. For each iteration, we generate a batch of synthetic spectrums in leaked format. Each leaked spectrum have an idea spectrum as the label.
 
 ```python
 def train(model, blur_matrix_right, feature_len, n_epoch, n_itr_per_epoch, n_batch_size, optimizer):
@@ -1194,7 +1190,7 @@ def bichannel_float_tensor_to_complex_array(x):
 
 After training the SEN network with sufficient epochs, we test the performance with spectrograms collected from Wi-Fi.
 
-First, we define some parameters. The STFT window width is set to 125, and the window type is set to "gaussian". The path to the pre-trained model and the CSI file is selected.
+First, we define some parameters. The STFT window width is set to `125`, and the window type is set to `gaussian`. The path to the pre-trained model and the CSI file is selected.
 
 ```python
 W = 125
@@ -1227,7 +1223,7 @@ if __name__ == "__main__":
         scio.savemat('SEN_test_y_complex_W' + str(W) + '.mat', {'y':y})
 ```
 
-This function first transforms the CSI data into spectrograms and crops the concerned frequency range between $\[-60, 60]$ Hz. Then, it unwraps the frequency bins and performs normalizations.
+This function first transforms the CSI data into spectrograms and crops the concerned frequency range between $$[-60, 60]$$ Hz. Then, it unwraps the frequency bins and performs normalizations.
 
 ```python
 def csi_to_spec():
@@ -1269,7 +1265,7 @@ def STFT(signal, fs=1, stride=1, wind_wid=5, dft_wid=5, window_type='gaussian'):
     return f_bins, stft_spectrum
 ```
 
-This function scales the spectrograms to normalize the values into $\[0, 1]$.
+This function scales the spectrograms to normalize the values into $$[0, 1]$$.
 
 ```python
 def normalize_data(data_1):
@@ -1282,10 +1278,10 @@ def normalize_data(data_1):
     return  data_1_norm
 ```
 
-Figure. 18 and 19 demonstrates the raw and enhanced spectrograms of pushing and pulling gestures.
+Figure 21 and 22 demonstrates the raw and enhanced spectrograms of pushing and pulling gestures.
 
-<figure><img src=".gitbook/assets/spec_gesture_1.png" alt=""><figcaption><p>Fig. 18. The measured spectrogram of a pushing and pulling gesture. </p></figcaption></figure>
+<figure><img src=".gitbook/assets/spec_gesture_1.png" alt=""><figcaption><p>Fig. 21. The measured spectrogram of a pushing and pulling gesture. </p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/spec_gesture_2.png" alt=""><figcaption><p>Fig. 19. The enhanced spectrogram from the SEN of a pushing and pulling gesture.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/spec_gesture_2.png" alt=""><figcaption><p>Fig. 22. The enhanced spectrogram from the SEN of a pushing and pulling gesture.</p></figcaption></figure>
 
 [^1]: [https://www.usenix.org/conference/nsdi23/presentation/yang-zheng](https://www.usenix.org/conference/nsdi23/presentation/yang-zheng)

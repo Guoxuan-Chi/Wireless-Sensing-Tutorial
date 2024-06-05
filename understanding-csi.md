@@ -11,13 +11,13 @@ This section focuses on two mainstream CSI models: the ray-tracing model and the
 In typical indoor environments, a signal sent by the transmitter arrives at the receiver via multiple paths due to the reflection of the radio wave. Along each path, the signal experiences a certain attenuation and phase shift. The received signal is the superimposition of multiple alias versions of the transmitted signal. Therefore, the complex baseband signal strength measured at the receiver at a specific time can be written as follows :
 
 $$
-V=\sum_{n=1}^{N}{\lVert V_n \rVert e^{-j\phi_n}},
+V=\sum_{n=1}^{N}{\lVert V_n \rVert e^{-j\phi_n}},  (1)
 $$
 
 where $$V_n$$ and $$\phi_n$$ are the amplitude and phase of the $$n^{th}$$ multipath component (note that the modulation scheme of the signal is implicitly considered), and $$N$$ is the total number of components. On this basis, the recieve signal strength indicator (RSSI) can be written as the received power in decibels (dB):
 
 $$
-\mathrm{RSSI} = 10\log_2\left( \lVert V \rVert^2 \right).
+\mathrm{RSSI} = 10\log_2\left( \lVert V \rVert^2 \right).  (2)
 $$
 
 As the superimposition of multipath components, RSSI not only varies rapidly with propagation distance changing at the order of the signal wavelength but also fluctuates over time, even for a static link. A slight change in specific multipath components may result in significant constructive or destructive multipath components, leading to considerable fluctuations in RSSI.
@@ -27,7 +27,7 @@ As the superimposition of multipath components, RSSI not only varies rapidly wit
 The essential drawback of RSSI is the failure to reflect the multipath effect. The wireless channel is modeled as a linear temporal filter to fully characterize individual paths, known as channel impulse response (CIR). Under the time-invariant assumption, CIR $h(t)$ is represented as:
 
 $$
-h(t) = \sum_{n=1}^{N}{\alpha_n e^{-j\phi_n} \delta(t - \tau_n)},
+h(t) = \sum_{n=1}^{N}{\alpha_n e^{-j\phi_n} \delta(t - \tau_n)},  (3)
 $$
 
 where $$\alpha_n$$, $$\phi_n$$, and $$\tau_n$$ are the complex antenuation, phase, and time delay of the $$n^{th}$$ path, respectively. $$N$$ is the total number of multipath and $$\delta(\cdot)$$ is the Dirac delta function. Each impulse represents a delayed multipath component, multiplied by the corresponding amplitude and phase.
@@ -37,7 +37,7 @@ In the frequency domain, the multipath causes frequency-selective fading, which 
 CIR and CFR are measured by decoupling the transmitted signal from the received signal. Specifically, in the time domain, the received signal $$r(t)$$ is the convolution of transmitted signal $$s(t)$$ and channel impulse response $$h(t)$$:
 
 $$
-r(t) = s(t) \otimes h(t),
+r(t) = s(t) \otimes h(t), (4)
 $$
 
 which indicates the recieved signal is generated from the transmit signal after it propagating from multipath channel.
@@ -45,15 +45,15 @@ which indicates the recieved signal is generated from the transmit signal after 
 Similarly, in the frequency domain, the received signal spectrum $$R(f)$$ is the multiplication of the transmitted signal spectrum $$S(f)$$ and the channel frequency response $$H(f)$$:
 
 $$
-R(f) = S(f) H(f). (4)
+R(f) = S(f) H(f). (5)
 $$
 
-Note that the $$R(f)$$ and $$S(f)$$ are the Fourier transform of the recieved signal $$r(t)$$ and the transmitted signal $$s(t)$$ respectively. In this way, Eqn.4 and Eqn.5 forms a beautiful \`\`symmetric'' relationship.
+Note that the $$R(f)$$ and $$S(f)$$ are the Fourier transform of the recieved signal $$r(t)$$ and the transmitted signal $$s(t)$$ respectively. In this way, Eqn.4 and Eqn.5 forms a beautiful "symmetric" relationship.
 
 As demonstrated in Eqn.4 and Eqn.5, CIR can be derived from the deconvolution operation of received and transmitted signals, and CFR can be treated as the ratio of the received and the transmitted spectrums. Compared with multiplication, the convolution operation is generally time-consuming. Therefore, in most cases, the device focuses on calculating the CFR, and the CIR can be further derived from the CFR using the inverse Fourier transform :
 
 $$
-h(t) = \frac{1}{P_s}\mathfrak{F}^{-1}\left\{ S^*(f)R(f) \right\},
+h(t) = \frac{1}{P_s}\mathfrak{F}^{-1}\left\{ S^*(f)R(f) \right\},  (6)
 $$
 
 where $$\mathfrak{F}^{-1}$$ denotes the inverse Fourier transform, $$*$$ is the conjugate operator, and $$P_s$$ approximates the transmitted signal power.
@@ -86,7 +86,7 @@ where $$N$$ is the total number of reflection paths, $$\alpha_n$$ is the amplitu
 
 <figure><img src=".gitbook/assets/wispeed_model.png" alt=""><figcaption><p>Fig. 3. Wi-Fi signals in rich-scattering environment.</p></figcaption></figure>
 
-As shown in Figure. 3, the scattering model treats all the objects in indoor environments as \textit{scatterers} that diffuse the signals to all directions. The CSI observed by the receiver is added up with the portions contributed by the static (furniture, walls, etc.) and dynamic (arms, legs, etc.) scatterers. Intuitively, each scatter is deemed as a virtual Tx. Such modeling can be applied to typical indoor scenarios, where the rooms are crowded with furniture, and signals could propagate in almost all directions. On this basis, we can dismiss the specific signal propagation path and only statistically investigate the relationship between the observed CSI and the moving speed.
+As shown in Figure 3, the scattering model treats all the objects in indoor environments as scatterers  that diffuse the signals to all directions. The CSI observed by the receiver is added up with the portions contributed by the static (furniture, walls, etc.) and dynamic (arms, legs, etc.) scatterers. Intuitively, each scatter is deemed as a virtual Tx. Such modeling can be applied to typical indoor scenarios, where the rooms are crowded with furniture, and signals could propagate in almost all directions. On this basis, we can dismiss the specific signal propagation path and only statistically investigate the relationship between the observed CSI and the moving speed.
 
 We decompose the observed CSI into the portions contributed by individual scatterers:
 
@@ -100,27 +100,27 @@ $$
 H_p(f,t) = \int_{0}^{2\pi}\int_{0}^{\pi}{h_p(\alpha,\beta,f,t)\exp(-jkv_p\cos(\alpha)t)\mathrm{d} \alpha \mathrm{d} \beta}, (10)
 $$
 
-where $$k=2\pi/\lambda$$ and $$\lambda$$ is the signal wavelength, $$v_p$$ is the speed of the $$p^{th}$$ dynamic scatterer, $$\alpha$$ and $$\beta$$ are the azimuth and elevation angles, $$\exp(-jkv_i\cos(\alpha)t)$$ represents the phase shift of the signal on direction $$(\alpha,\beta)$$. $$h_p(\alpha,\beta,f,t)$$ is the portion of observed CSI contributed by $$p^{th}$$ scatterer on direction $(\alpha,\beta)$. Inherited from the physical properties of EM waves \[^6], $h\_p(\alpha,\beta,f,t)$ can be viewed as a circularly-symmetric Gaussian random variable. For $\forall p, q \in \Omega\_d$ and $(\alpha\_1,\beta\_1) \neq (\alpha\_2,\beta\_2)$, $h\_p(\alpha\_1,\beta\_1,f,t)$ is independent of $h\_q(\alpha\_2,\beta\_2,f,t)$.
+where $$k=2\pi/\lambda$$ and $$\lambda$$ is the signal wavelength, $$v_p$$ is the speed of the $$p^{th}$$ dynamic scatterer, $$\alpha$$ and $$\beta$$ are the azimuth and elevation angles, $$\exp(-jkv_i\cos(\alpha)t)$$ represents the phase shift of the signal on direction $$(\alpha,\beta)$$. $$h_p(\alpha,\beta,f,t)$$ is the portion of observed CSI contributed by $$p^{th}$$ scatterer on direction $$(\alpha,\beta)$$. Inherited from the physical properties of EM waves, $$h_p(\alpha,\beta,f,t)$$ can be viewed as a circularly-symmetric Gaussian random variable. For $$\forall p, q \in \Omega_d$$ and $$(\alpha_1,\beta_1) \neq (\alpha_2,\beta_2)$$, $$h_p(\alpha_1,\beta_1,f,t)$$ is independent of $$h_q(\alpha_2,\beta_2,f,t)$$.
 
-Based on Eqn.9 and Eqn.10, we are able to derive the statistical property by analyzing the autocorrelation function (ACF) of $H(f,t)$ \[^6]:
-
-$$
-\tag{11} \begin{split} \rho_{H}(f,\tau)&\triangleq \frac{\mathrm{Cov}[H(f,t),H(f,t+\tau)]}{\mathrm{Cov}[H(f,t),H(f,t)]}\\ &=\frac{\sum_{p \in \Omega_d}{\sigma_p^2(f) \mathrm{sinc}(kv \tau)}}{\sum_{p \in \Omega_d}{\sigma_p^2(f)}} \approx \mathrm{sinc}(kv\tau), \end{split}
-$$
-
-where $\mathrm{Cov}\[\cdot,\cdot]$ is the covariance between two random variables, $\sigma\_p^2(f)$ is the variance of $h\_p(\alpha,\beta,f,t)$, $\mathrm{sinc}(kv \tau) = \frac{\sin(kv \tau)}{kv \tau}$, and $\tau$ is the time lag.
-
-For some human activities like fall and walking, we can assume that the dynamic scatterers are mainly on the torso and have similar speeds $v$. Thus, Eqn.11 is approximated with a much simpler form: $\rho\_{H}(f,\tau) \approx \mathrm{sinc}(kv\tau)$. Using this formulation, we have quantitatively established the relationship between the huamn speed and the ACF of CSI. In practice, the speed $v$ is extracted by matching the first peak of the $\mathrm{sinc}(x)$ function and the first peak of ACF:
+Based on Eqn.9 and Eqn.10, we are able to derive the statistical property by analyzing the autocorrelation function (ACF) of $$H(f,t)$$:
 
 $$
-\tag{12} v=\frac{x_0}{k \tau_0}=\frac{x_0 \lambda}{2\pi \tau_0},
+\begin{split} \rho_{H}(f,\tau)&\triangleq \frac{\mathrm{Cov}[H(f,t),H(f,t+\tau)]}{\mathrm{Cov}[H(f,t),H(f,t)]}\\ &=\frac{\sum_{p \in \Omega_d}{\sigma_p^2(f) \mathrm{sinc}(kv \tau)}}{\sum_{p \in \Omega_d}{\sigma_p^2(f)}} \approx \mathrm{sinc}(kv\tau), \end{split} (11)
 $$
 
-where $x\_0$ is the constant value representing the location of the first peak of $\mathrm{sinc}(x)$ function, $\tau\_0$ is the time lag corresponding to the first peak of the ACF.
+where $$\mathrm{Cov}[\cdot,\cdot]$$ is the covariance between two random variables, $$\sigma_p^2(f)$$ is the variance of $$h_p(\alpha,\beta,f,t)$$, $$\mathrm{sinc}(kv \tau) = \frac{\sin(kv \tau)}{kv \tau}$$, and $$\tau$$ is the time lag.
 
-As a straightforward example, we let a volunteer to walk and fall in a heavily furnished room and extract the speed with the CSI collected from a Wi-Fi link located in another room. As is shown in Figure. 4, even with non-line-of-sight (NLoS) occlusions and multipath pollution, the walking speed and fall speed are estimated consistently, demonstrating its robustness to environmental diversity.
+For some human activities like fall and walking, we can assume that the dynamic scatterers are mainly on the torso and have similar speeds $$v$$. Thus, Eqn. 11 is approximated with a much simpler form: $$\rho_{H}(f,\tau) \approx \mathrm{sinc}(kv\tau)$$. Using this formulation, we have quantitatively established the relationship between the huamn speed and the ACF of CSI. In practice, the speed $$v$$ is extracted by matching the first peak of the $$\mathrm{sinc}(x)$$ function and the first peak of ACF:
 
-&#x20;\*\* Fig. 4. The estimated speed and the ACF of CSI signals.\*\*
+$$
+v=\frac{x_0}{k \tau_0}=\frac{x_0 \lambda}{2\pi \tau_0}, (12)
+$$
+
+where $$x_0$$ is the constant value representing the location of the first peak of $$\mathrm{sinc}(x)$$function, $$\tau_0$$ is the time lag corresponding to the first peak of the ACF.
+
+As a straightforward example, we let a volunteer to walk and fall in a heavily furnished room and extract the speed with the CSI collected from a Wi-Fi link located in another room. As is shown in Figure 4, even with non-line-of-sight (NLoS) occlusions and multipath pollution, the walking speed and fall speed are estimated consistently, demonstrating its robustness to environmental diversity.
+
+<figure><img src=".gitbook/assets/wispeed_SM.png" alt=""><figcaption><p>Fig. 4. The estimated speed and the ACF of CSI signals.</p></figcaption></figure>
 
 The scattering model is generally applicable to various speed-oriented sensing The scattering model generally applies to various speed-oriented sensing tasks such as intrusion detection and fall detection. As a statistical model, it has unique advantages in complex scenarios.
 

@@ -2,7 +2,7 @@
 
 ⚡️ **Wireless sensing** is an emerging technology that leverages ubiquitous wireless signals to perceive our surroundings.
 
-It enables a wide range of applications, such as `🖐🏻 gesture recognition` for human-computer interaction, `💛 vital signs monitoring` for health care, and `🕶 intrusion detection` for security management.
+It enables a wide range of applications, such as `🖐🏻 gesture recognition` for human-computer interaction, `💗vital signs monitoring` for health care, and `🕶 intrusion detection` for security management.
 
 Compared with other sensing paradigms, such as `📷 vision-based sensing`, wireless sensing solutions have unique advantages such as high coverage, pervasiveness, low cost, and robustness under adverse light and texture scenarios. Besides, wireless sensing solutions are generally lightweight in terms of both computation overhead and device size.
 

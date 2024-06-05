@@ -76,21 +76,21 @@ disp("The estimated distance is: " + num2str(est_dist) + " m");
 
 
 
-<figure><img src=".gitbook/assets/p2c2_ToF.png" alt=""><figcaption><p>Fig. 5. The relationship between ToF and CIR.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/p2c2_ToF.png" alt=""><figcaption><p>Fig. 6. The relationship between ToF and CIR.</p></figcaption></figure>
 
 ToF is the time duration the signal propagates from the transmitter to the receiver along a specific path. Given the frequency $f$, the phase shift introduced by the ToF $\tau$ is:
 
 $$
-\phi_{\mathrm{ToF}} = -2\pi f \tau. \tag{13}
+\phi_{\mathrm{ToF}} = -2\pi f \tau.  (13)
 $$
 
 As the superimposition of multipath signals, CSI can be represented based on the ray-tracing model:
 
 $$
-H(f)=\sum_{n=1}^{N}\alpha_{n}e^{-j2\pi f\tau_n} \tag{14}
+H(f)=\sum_{n=1}^{N}\alpha_{n}e^{-j2\pi f\tau_n}, (14)
 $$
 
-where $N$ is the total number of multipath, and $\alpha\_n$ and $\tau\_n$ are the complex attenuation factor and time of flight (ToF) for the $n^{th}$ path, respectively. Theoretically, the ToF of all paths can be identified in CIR, which can be calculated by applying the inverse Fourier transform to CSI samples of all subcarriers. However, since the transmitter and the receiver lack synchronization, non-zero temporal shifts exist in CIR, and the absolute ToF is typically not accurate enough. The limited bandwidth also constrains the time resolution, causing meter-level ToF ambiguity The relationship between signal propagation path, ToF, and CIR is shown in Figure. 5.
+where $$N$$ is the total number of multipath, and $$\alpha_n$$ and $$\tau_n$$ are the complex attenuation factor and time of flight (ToF) for the $$n^{th}$$ path, respectively. Theoretically, the ToF of all paths can be identified in CIR, which can be calculated by applying the inverse Fourier transform to CSI samples of all subcarriers. However, since the transmitter and the receiver lack synchronization, non-zero temporal shifts exist in CIR, and the absolute ToF is typically not accurate enough. The limited bandwidth also constrains the time resolution, causing meter-level ToF ambiguity The relationship between signal propagation path, ToF, and CIR is shown in Figure 6.
 
 The following function `naive_tof` intends to extract the ToF of the strongest path (typically the shortest path) based on inverse Fourier transform.
 
@@ -130,7 +130,7 @@ function [tof_mat] = naive_tof(csi_data)
 end
 ```
 
-Similar to the methods used for angle estimation, there is also an algorithm that utilizes grid search to determine the time of flight. For a wave with a propagation time of \$$\ta\$$, the induced phase shift should be \$$2 \pi(f+\Delta f) \tau\$$. For each propagation time within the search range, we construct an operator \$$\epsilon\_{\mathrm{ToF\}}=e^{j 2 \pi(f+\Delta f) \tau\$$, where \$$\Delta \$$ represents the frequency offset among different subcarriers. Thus, this operator varies with different frequencies (i.e., different subcarriers). We conjugate-multiply this operator with the received CSI, and then take the real part as a representation of the "matching degree" for the corresponding ToF.The main idea is that if the corresponding \$$\ta\$$ is correct, the result after multiplication should be a pure real number, which effectively represents the magnitude of the path CSI. Conversely, if the \$$\ta\$$ is incorrect, the result obtained by taking the real part should be relatively small.The following function `grid_search_tof` intends to estimate the tof by matching the most appropriate signal propagation time.
+Similar to the methods used for angle estimation, there is also an algorithm that utilizes grid search to determine the time of flight. For a wave with a propagation time of $$\tau$$, the induced phase shift should be $$2 \pi(f+\Delta f) \tau$$. For each propagation time within the search range, we construct an operator $$\epsilon_{\mathrm{ToF}}=e^{j 2 \pi(f+\Delta f) \tau}$$, where $$\Delta$$ represents the frequency offset among different subcarriers. Thus, this operator varies with different frequencies (i.e., different subcarriers). We conjugate-multiply this operator with the received CSI, and then take the real part as a representation of the "matching degree" for the corresponding ToF.The main idea is that if the corresponding $$\tau$$ is correct, the result after multiplication should be a pure real number, which effectively represents the magnitude of the path CSI. Conversely, if the $$\tau$$ is incorrect, the result obtained by taking the real part should be relatively small.The following function `grid_search_tof` intends to estimate the tof by matching the most appropriate signal propagation time.
 
 ```matlab
 function tof = grid_search_tof(CSI, fc_list)
@@ -169,67 +169,67 @@ end
 
 &#x20;
 
-<figure><img src=".gitbook/assets/p2c2_AoA_AoD.png" alt=""><figcaption><p> Fig. 6. Angle of Arrival and Angle of Departure.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/p2c2_AoA_AoD.png" alt=""><figcaption><p> Fig. 7. Angle of Arrival and Angle of Departure.</p></figcaption></figure>
 
-When a NIC equipes with multiple antennas, a local coordinate at the device can be created. As shown in Figure. 6, for a transmitter, the angle of departure (AoD) $\varphi$ represents the direction in the local coordinate along which the transmitted signal is emitted. For a receiver, the angle of arrival (AoA) $\theta$ represents the direction in the local coordinate along which the received signal is captured. Since the antennas are spatially separated, non-zero phase shifts between antennas are introduced. The phase shifts depend on the AoA/AoD. Specifically, suppose the relative location between two antennas is $\bm{\Delta{l\}}=(\Delta\_x, \Delta\_y)$ and the unit direciton vector of AoA is $\bm{e}=(\cos\theta, \sin\theta)$, the phase shift between the two antennas is:
+When a NIC equipes with multiple antennas, a local coordinate at the device can be created. As shown in Figure 7, for a transmitter, the angle of departure (AoD) $$\varphi$$ represents the direction in the local coordinate along which the transmitted signal is emitted. For a receiver, the angle of arrival (AoA) $$\theta$$ represents the direction in the local coordinate along which the received signal is captured. Since the antennas are spatially separated, non-zero phase shifts between antennas are introduced. The phase shifts depend on the AoA/AoD. Specifically, suppose the relative location between two antennas is $$\bm{\Delta{l}}=(\Delta_x, \Delta_y)$$ and the unit direciton vector of AoA is $$\bm{e}=(\cos\theta, \sin\theta)$$, the phase shift between the two antennas is:
 
 $$
-\tag{15} \phi_{\mathrm{AoA}} = \frac{2\pi}{\lambda}\bm{\Delta{l}}\cdot\bm{e}
+\phi_{\mathrm{AoA}} = \frac{2\pi}{\lambda}\bm{\Delta{l}}\cdot\bm{e}. (15)
 $$
 
 Then CSI can be modeled as:
 
 $$
-\tag{16} H(k)=\sum_{n=1}^{N}\alpha_{n}e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l}}\cdot\bm{e}}
+H(k)=\sum_{n=1}^{N}\alpha_{n}e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l}}\cdot\bm{e}}, (16)
 $$
 
-where $k$ represents the $k^{th}$ antenna at the receiver. The same model applies to the AoD at the trasmitter side and the 3D space with azimuth and elevation angles.
+where $$k$$ represents the $$k^{th}$$ antenna at the receiver. The same model applies to the AoD at the trasmitter side and the 3D space with azimuth and elevation angles.
 
 In practice, algorithms such as Capon and MUSIC can be used to estimate the AoA/AoD of multiple paths from the CSI of the antenna array.
 
 MUSIC analyses the incident signals on multiple antennas to find out the AoA of each signal.
 
-Specifically, suppose $D$ signals $F\_{1},\cdots,F\_{D}$ arrive from directions $\theta\_{1},\cdots,\theta\_{D}$ at $M > D$ antennas.
+Specifically, suppose $$D$$ signals $$F_{1},\cdots,F_{D}$$ arrive from directions $$\theta_{1},\cdots,\theta_{D}$$ at $$M > D$$ antennas.
 
-The received signal at the $k^{th}$ antenna element, denoted as $X\_{k}$, is a linear combination of the $D$ incident wavefronts and noise $W\_{k}$:
+The received signal at the $$k^{th}$$ antenna element, denoted as $$X_{k}$$, is a linear combination of the $$D$$ incident wavefronts and noise $$W_{k}$$:
 
 $$
-\tag{17} \left[\begin{array}{c} X_{1} \\ X_{2} \\ \vdots \\ X_{M} \end{array}\right]=\left[\begin{array}{llll} a\left(\theta_{1}\right) & a\left(\theta_{2}\right) & \ldots & a\left(\theta_{D}\right) \end{array}\right]\left[\begin{array}{c} F_{1} \\ F_{2} \\ \vdots \\ F_{D} \end{array}\right]+\left[\begin{array}{c} W_{1} \\ W_{2} \\ \vdots \\ W_{M} \end{array}\right],
+\left[\begin{array}{c} X_{1} \\ X_{2} \\ \vdots \\ X_{M} \end{array}\right]=\left[\begin{array}{llll} a\left(\theta_{1}\right) & a\left(\theta_{2}\right) & \ldots & a\left(\theta_{D}\right) \end{array}\right]\left[\begin{array}{c} F_{1} \\ F_{2} \\ \vdots \\ F_{D} \end{array}\right]+\left[\begin{array}{c} W_{1} \\ W_{2} \\ \vdots \\ W_{M} \end{array}\right], (17)
 $$
 
 or
 
 $$
-\tag{18} X=A F+W,
+\bm{X}=\bm{A F+W}, (18)
 $$
 
-where $\bm{a}(\theta\_{k})$ is the array steering vector that characterizes added phase (relative to the first antenna) of each receiving component at the $k^{th}$ antenna, and $\bm{A}$ is the matrix of steer vectors.
+where $$\bm{a}(\theta_{k})$$ is the array steering vector that characterizes added phase (relative to the first antenna) of each receiving component at the $$k^{th}$$ antenna, and $$\bm{A}$$ is the matrix of steer vectors.
 
-As shown in Figure. 6, for a linear antenna array with elements well synchronized,
+As shown in Figure 7, for a linear antenna array with elements well synchronized,
 
 $$
 \bm{a}(\theta)=\left[ \begin{array}{c} 1\\ e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l(1)}}\cdot\bm{e}}\\ e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l(2)}}\cdot\bm{e}}\\ \vdots\\ e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l(M-1)}}\cdot\bm{e}} \end{array} \right]. (19)
 $$
 
-Suppose $W\_{k}\sim N(0, \sigma^{2})$, and $F\_k$ is a wide-sense stationary process with zero mean value, the $M\times M$ covariance matrix of the received signal vector $\bm{X}$ is:
+Suppose $$W_{k}\sim N(0, \sigma^{2})$$, and $$F_k$$ is a wide-sense stationary process with zero mean value, the $$M\times M$$ covariance matrix of the received signal vector $$\bm{X}$$ is:
 
 $$
 \begin{aligned} S &=\overline{X X^{\mathrm{H}}} \\ &=A \overline{F F^{\mathrm{H}}} A^{\mathrm{H}}+\overline{W W^{\mathrm{H}}} \\ &=A P A^{\mathrm{H}}+\sigma^{2} I, \end{aligned} (20)
 $$
 
-where $\bm{P}$ is the covariance matrix of transmission vector $\bm{F}$. The notation $(\cdot)^{\mathrm{H\}}$ represents conjugate transpose and $\overline{(\cdot)}$ represents expectation.
+where $$\bm{P}$$ is the covariance matrix of transmission vector $$\bm{F}$$. The notation $$(\cdot)^{\mathrm{H}}$$ represents conjugate transpose and $$\overline{(\cdot)}$$ represents expectation.
 
-The covariance matrix $\bm{S}$ has $M$ eigenvalues $\lambda\_{1},\cdots,\lambda\_{M}$ associated with $M$ eigenvectors $\bm{e}_{1},\bm{e}_{1},\cdots,\bm{e}\_{M}$. Sorted in a non-descending order, the smallest $M-D$ eigenvalues correspond to the noise while the rest $D$ correspond to the $D$ incident signals.
+The covariance matrix $$\bm{S}$$ has $$M$$ eigenvalues $$\lambda_{1},\cdots,\lambda_{M}$$ associated with $$M$$ eigenvectors $$\bm{e}{1},\bm{e}{1},\cdots,\bm{e}_{M}$$. Sorted in a non-descending order, the smallest $$M-D$$ eigenvalues correspond to the noise while the rest $$D$$ correspond to the $$D$$ incident signals.
 
-In other word, the $M$-dimension space can be divided into two orthogonal subspace, the noise subspace $\bm{E}_{N}$ expanded by eigenvectors $\bm{e}_{1},\cdots,\bm{e}_{M-D}$, and the signal subspace $\bm{E}_{S}$ expanded by eigenvectors $\bm{e}_{M-D+1},\cdots,\bm{e}_{M}$ (or equivalently $D$ array steering vector $\bm{a}(\theta\_{1}),\cdots,\bm{a}(\theta\_{D})$).
+In other word, the $$M$$-dimension space can be divided into two orthogonal subspace, the noise subspace $$\bm{E}_{N}$$  expanded by the eigenvectors $$\bm{e}_{1},\cdots,\bm{e}_{M-D}$$ and the signal subspace $$\bm{E}_{S}$$ expanded by eigenvectors $$\bm{e}_{M-D+1},\cdots,\bm{e}_{M}$$ (or equivalently $$D$$ array steering vector $$\bm{a}(\theta_{1}),\cdots,\bm{a}(\theta_{D})$$).
 
-To solve for the array steering vectors (thus AoA), MUSIC plots the reciprocal of squared distance $Q(\theta)$ for points along the $\theta$ continue to the noise subspace as a function of $\theta$:
+To solve for the array steering vectors (thus AoA), MUSIC plots the reciprocal of squared distance $$Q(\theta)$$ for points along the $$\theta$$ continue to the noise subspace as a function of $$\theta$$:
 
 $$
-\tag{21} Q(\theta)=\frac{1}{\bm{a}^{\mathrm{H}}(\theta)\bm{E}_{N}\bm{E}_{N}^{\mathrm{H}}\bm{a}(\theta)}
+Q(\theta)=\frac{1}{\bm{a}^{\mathrm{H}}(\theta)\bm{E}_{N}\bm{E}_{N}^{\mathrm{H}}\bm{a}(\theta)}. (21)
 $$
 
-This yields peaks in $Q(\theta)$ at the bearing of incident signals. It is similar to apply MUSIC algorithm for AoD spectrum estimation.
+This yields peaks in $$Q(\theta)$$ at the bearing of incident signals. It is similar to apply MUSIC algorithm for AoD spectrum estimation.
 
 The following function `naive_aoa` intends to estimate the 3D AoA based on the phase difference, which is similar to Eqn. 15. Note that the following algorithm only considers one path, and thus cannot be applied to mutlipath signals.
 
@@ -274,7 +274,7 @@ end
 
 Besides the methods explicitly solving for Angle of Arrival (AoA) and Angle of Departure (AoD), there is another algorithm that utilizes grid search to find the optimal angle. The basic principle of this algorithm is illustrated in the figure below.
 
-<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Fig. 7. Grid Search based AoA and AoD extraction algorithm.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Fig. 8. Grid Search based AoA and AoD extraction algorithm.</p></figcaption></figure>
 
 Assuming the antenna spacing of the Access Point (AP) is $$d$$, for a wave with an incidence angle of $$\theta$$, a phase difference of $$2\pi\frac{d\sin\theta}{\lambda}$$ is introduced between two antennas. For each incidence angle $$\theta$$, we construct an operator $$\epsilon_{\mathrm{AoA}} = e^{j 2 \pi \frac{d\sin\theta}{\lambda}}$$ representing the phase difference between the two antennas. We then conjugate-multiply the CSI received by the two antennas spaced by $$d$$, followed by multiplying with the operator $$\epsilon_{\mathrm{AoA}}$$, and then take the real part as a representation of the "matching degree" for the corresponding AoA. We define a minimum $$\Delta$$ as the search unit and then iterate over all angles to calculate the "matching degree" for AoA. If the corresponding angle is correct, theoretically, the final multiplication result should be a pure real number; otherwise, it will be imaginary, and the value after taking the real part will be relatively small.&#x20;
 
@@ -401,24 +401,24 @@ end
 
 
 
-<figure><img src=".gitbook/assets/p2c2_DFS.png" alt=""><figcaption><p>Fig. 7. Phase shift spectrum (a.k.a Doppler spectrum) of three different moving path.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/p2c2_DFS.png" alt=""><figcaption><p>Fig. 9. Phase shift spectrum (a.k.a Doppler spectrum) of three different moving path.</p></figcaption></figure>
 
-Non-zero phase shift $\Delta \phi$ across different packets is caused by the relative movement of the transmitter, receiver, or objects in the propagation path of the signal. It equals the changing rate of the path length of the signal.\
-When multiple packets are received in sequence, the CSI corresponding to the $i^{th}$ received packet is:
-
-$$
-H(i) = \sum_{n=1}^{N}\alpha_{n}(i)e^{j\phi_{n}(i)}, \tag{22}
-$$
-
-where $\phi\_{n}$ is the phase of the $n^{th}$ path . Extract the phase of the the $n^{th}$ path in packet $i$ and $i+1$ respectively, and calculate the phase shift as:
+Non-zero phase shift $$\Delta \phi$$ across different packets is caused by the relative movement of the transmitter, receiver, or objects in the propagation path of the signal. It equals the changing rate of the path length of the signal.\
+When multiple packets are received in sequence, the CSI corresponding to the $$i^{th}$$ received packet is:
 
 $$
-\Delta \phi_{n}(i) = \phi_{n}(i+1) - \phi_{n}(i). \tag{23}
+H(i) = \sum_{n=1}^{N}\alpha_{n}(i)e^{j\phi_{n}(i)}, (22)
 $$
 
-Intuitively, the phase difference indicates the distance change of the $n^{th}$ path between two consecutive packets: $\Delta d\_{n}(i) = \frac{\Delta \phi\_{n}(i)}{2 \pi} \lambda$.
+where $$\phi_{n}$$ is the phase of the $$n^{th}$$ path . Extract the phase of the the $$n^{th}$$ path in packet $$i$$ and $$i+1$$ respectively, and calculate the phase shift as:
 
-Take a step further, and apply the short-time Fourier transform (STFT) within a sliding window, we can get the spectrum as shown in Figure. 7. The frequency axis reveals the change rate of consecutive CSI data, and implicitly contains the path length change rate. Figure. 7 demonstrates the phase shift spectrum (or the Doppler Spectrum) for three different moving paths.
+$$
+\Delta \phi_{n}(i) = \phi_{n}(i+1) - \phi_{n}(i). (23)
+$$
+
+Intuitively, the phase difference indicates the distance change of the $$n^{th}$$ path between two consecutive packets: $$\Delta d_{n}(i) = \frac{\Delta \phi_{n}(i)}{2 \pi} \lambda$$.
+
+Take a step further, and apply the short-time Fourier transform (STFT) within a sliding window, we can get the spectrum as shown in Figure 9. The frequency axis reveals the change rate of consecutive CSI data, and implicitly contains the path length change rate. Figure. 7 demonstrates the phase shift spectrum (or the Doppler Spectrum) for three different moving paths.
 
 The following function `naive_spectrum` calculates the short-time Fourier transform of a series of CSI data. The generated spectrum can be used effectively for many wireless sensing tasks, like gesture recognition and fall detection.
 
@@ -445,59 +445,61 @@ end
 
 ## Body-coordinate Velocity Profile
 
-&#x20;\*\* Fig. 8. Relationship between the BVP and Doppler spectrum. Each velocity component in BVP is projected onto the normal direction of a link, and contributes to the power of the corresponding radial velocity component in the Doppler spectrum.\*\*
+&#x20;
+
+<figure><img src=".gitbook/assets/vp.png" alt=""><figcaption><p>Fig. 10. Relationship between the BVP and Doppler spectrum. Each velocity component in BVP is projected onto the normal direction of a link, and contributes to the power of the corresponding radial velocity component in the Doppler spectrum.</p></figcaption></figure>
 
 The limitation of the aforementioned spectrum is that, even the spectrum corresponding to the same activity will be different when the user moves at different locations or orientations relative to the Wi-Fi links. To resolve this problem, Widar3.0 proposes a domain-independent signal feature BVP (body-coordinate velocity profile) to characterize human activities.
 
-The basic idea of BVP is shown in Figure. 8. A BVP $\bm{V}$ is quantized as a discrete matrix with dimension as velocity components decomposed along each axis of the body coordinates. For convenience, we establish the local body coordinates whose origin is the location of the person and positive x-axis aligns with the orientation of the person. The person's location and orientation should be provided manually. Currently, it is assumed that the global location and orientation of the person are available. Then the known global locations of wireless transceivers can be transformed into the local body coordinates. Thus, for better clarity, all locations and orientations used in the following derivation are in the local body coordinates. Suppose the locations of the transmitter and the receiver of the $i^{th}$ link are $\vec{l}_{t}^{(i)}=(x_{t}^{(i)},y\_{t}^{(i)})$, $\vec{l}_{r}^{(i)}=(x_{r}^{(i)},y\_{r}^{(i)})$, respectively, then any velocity components $\vec{v}=(v\_x, v\_y)$ around the human body (\ie, the origin) will contribute its signal power to some frequency component, denoted as $f^{(i)}(\vec{v})$, in the Doppler spectrum of the $i^{th}$ link :
+The basic idea of BVP is shown in Figure 10. A BVP $$\bm{V}$$ is quantized as a discrete matrix with dimension as velocity components decomposed along each axis of the body coordinates. For convenience, we establish the local body coordinates whose origin is the location of the person and positive x-axis aligns with the orientation of the person. The person's location and orientation should be provided manually. Currently, it is assumed that the global location and orientation of the person are available. Then the known global locations of wireless transceivers can be transformed into the local body coordinates. Thus, for better clarity, all locations and orientations used in the following derivation are in the local body coordinates. Suppose the locations of the transmitter and the receiver of the $$i^{th}$$ link are $$\vec{l}_{t}^{(i)}=(x_{t}^{(i)},y_{t}^{(i)})$$, $$\vec{l}_{r}^{(i)}=(x_{r}^{(i)},y_{r}^{(i)})$$, respectively, then any velocity components $$\vec{v}=(v_x, v_y)$$ around the human body (i.e., the origin) will contribute its signal power to some frequency component, denoted as $$f^{(i)}(\vec{v})$$, in the Doppler spectrum of the $$i^{th}$$ link :
 
 $$
-\tag{24} f^{(i)}(\vec{v})=a_{x}^{(i)}v_x+a_{y}^{(i)}v_y,
+f^{(i)}(\vec{v})=a_{x}^{(i)}v_x+a_{y}^{(i)}v_y, (24)
 $$
 
-where $a\_{x}^{(i)}$ and $a\_{y}^{(i)}$ are coefficients determined by locations of the transmitter and the receiver:
+where $$a_{x}^{(i)}$$ and $$a_{y}^{(i)}$$ are coefficients determined by locations of the transmitter and the receiver:
 
 $$
-\begin{aligned} \tag{25} a_{x}^{(i)} &=\frac{1}{\lambda}\left(\frac{x_{t}^{(i)}}{\left\|\vec{l}_{t}^{(i)}\right\|_{2}}+\frac{x_{r}^{(i)}}{\left\|\vec{l}_{r}^{(i)}\right\|_{2}}\right), \\ a_{y}^{(i)} &=\frac{1}{\lambda}\left(\frac{y_{t}^{(i)}}{\left\|\vec{l}_{t}^{(i)}\right\|_{2}}+\frac{y_{r}^{(i)}}{\left\|\vec{l}_{r}^{(i)}\right\|_{2}}\right), \end{aligned}
+\begin{aligned} a_{x}^{(i)} &=\frac{1}{\lambda}\left(\frac{x_{t}^{(i)}}{\left\|\vec{l}_{t}^{(i)}\right\|_{2}}+\frac{x_{r}^{(i)}}{\left\|\vec{l}_{r}^{(i)}\right\|_{2}}\right), \\ a_{y}^{(i)} &=\frac{1}{\lambda}\left(\frac{y_{t}^{(i)}}{\left\|\vec{l}_{t}^{(i)}\right\|_{2}}+\frac{y_{r}^{(i)}}{\left\|\vec{l}_{r}^{(i)}\right\|_{2}}\right), \end{aligned} (25)
 $$
 
-where $\lambda$ is the wavelength of Wi-Fi signal.
+where $$\lambda$$ is the wavelength of Wi-Fi signal.
 
-As static components with zero Doppler spectrum (\eg, the line of sight signals and dominant reflections from static objects) are filtered out before the Doppler spectrum are calculated, only signals reflected by the person are retained. Besides, when the person is close to the Wi-Fi link, only signals with one-time reflection have prominent magnitudes . Thus, Eqn.24 holds valid for the gesture recognition scenario. From the geometric view, Eqn.24 means that the 2-D velocity vector $\vec{v}$ is projected on a line whose direction vector is $\bm{d}^{(i)}=(-a\_{y}^{(i)}, a\_{x}^{(i)})$. Suppose the person is on an ellipse curve whose foci are the transmitter and the receiver of the $i^{th}$ link, then $d^{(i)}$ is indeed the average direction of the ellipse at the person's location. Figure. 8 shows an example where the person generates three velocity components $\vec{v}\_j, j=1,2,3$, and projection of the velocity components on the Doppler spectrum of three links.
+As static components with zero Doppler spectrum (e.g., the line of sight signals and dominant reflections from static objects) are filtered out before the Doppler spectrum are calculated, only signals reflected by the person are retained. Besides, when the person is close to the Wi-Fi link, only signals with one-time reflection have prominent magnitudes . Thus, Eqn. 24 holds valid for the gesture recognition scenario. From the geometric view, Eqn.24 means that the 2-D velocity vector $$\vec{v}$$ is projected on a line whose direction vector is $$\bm{d}^{(i)}=(-a_{y}^{(i)}, a_{x}^{(i)})$$. Suppose the person is on an ellipse curve whose foci are the transmitter and the receiver of the $$i^{th}$$ link, then $$d^{(i)}$$ is indeed the average direction of the ellipse at the person's location. Figure 10 shows an example where the person generates three velocity components $$\vec{v}_j, j=1,2,3$$, and projection of the velocity components on the Doppler spectrum of three links.
 
-Since coefficients $a\_{x}^{(i)}$ and $a\_{y}^{(i)}$ only depend on the location of the $i^{th}$ link, the relation of projection of the BVP on the $i^{th}$ link is fixed. Specifically, an assignment matrix $\bm{A}^{(i)}\_{F\times N^2}$ can be defined:
-
-$$
-\tag{26} A_{j, k}^{(i)}= \begin{cases}1 & f_{j}=f^{(i)}\left(\vec{v}_{k}\right) \\ 0 & \text { else }\end{cases},
-$$
-
-where $f\_j$ is the $j^{th}$ frequency sampling point in the Doppler spectrum, and $\vec{v}\_k$ is velocity component corresponding to the $k^{th}$ element of the vectorized BVP $\bm{V}$. Thus, the relation between Doppler spectrum profile of the $i^{th}$ link and the BVP can be modeled as:
+Since coefficients $$a_{x}^{(i)}$$ and $$a_{y}^{(i)}$$ only depend on the location of the $$i^{th}$$ link, the relation of projection of the BVP on the $$i^{th}$$ link is fixed. Specifically, an assignment matrix $$\bm{A}^{(i)}_{F\times N^2}$$ can be defined:
 
 $$
-\tag{27} \bm{D}^{(i)}=c^{(i)}\bm{A}^{(i)}\bm{V},
+A_{j, k}^{(i)}= \begin{cases}1 & f_{j}=f^{(i)}\left(\vec{v}_{k}\right) \\ 0 & \text { else }\end{cases}, (26)
 $$
 
-where $c^{(i)}$ is the scaling factor due to propagation loss of the reflected signal.
-
-Due to the sparsity of BVP, compressed sensing technique can be adopted to formulate the estimation of BVP as an $l\_0$ optimization problem:
+where $$f_j$$ is the $$j^{th}$$ frequency sampling point in the Doppler spectrum, and $$\vec{v}_k$$ is velocity component corresponding to the $$k^{th}$$ element of the vectorized BVP $$\bm{V}$$. Thus, the relation between Doppler spectrum profile of the $$i^{th}$$ link and the BVP can be modeled as:
 
 $$
-\tag{28} {\rm min}_{V}\sum_{i=1}^{M}|{\rm EMD}(\bm{A}^{(i)}\bm{V}, \bm{D}^{i})|+\eta\|V\|_0,
+\bm{D}^{(i)}=c^{(i)}\bm{A}^{(i)}\bm{V}, (27)
 $$
 
-where $M$ is the number of Wi-Fi links.
+where $$c^{(i)}$$ is the scaling factor due to propagation loss of the reflected signal.
 
-The sparsity of the number of the velocity components is coerced by the term $\eta|V|\_0$, where $\eta$ represents the sparsity coefficients and $|\cdot|\_0$ is the number of non-zero velocity components.
+Due to the sparsity of BVP, compressed sensing technique can be adopted to formulate the estimation of BVP as an $$l_0$$ optimization problem:
 
-${\rm EMD}(\cdot,\cdot)$ is the Earth Mover's Distance between two distributions. The selection of EMD rather than Euclidean distance is mainly due to two reasons. First, the quantization of BVP introduces approximation error, \ie, projection of velocity components to the Doppler spectrum bin might be adjacent to the true one. Such quantization error can be relieved by EMD, which takes the distance between bins into consideration. Second, there are unknown scaling factors between the BVP and Doppler spectrum, making the Euclidean distance inapplicable.
+$$
+{\rm min}_{V}\sum_{i=1}^{M}|{\rm EMD}(\bm{A}^{(i)}\bm{V}, \bm{D}^{i})|+\eta\|V\|_0, (28)
+$$
+
+where $$M$$ is the number of Wi-Fi links.
+
+The sparsity of the number of the velocity components is coerced by the term $$\eta\|V\|_0$$, where $$\eta$$ represents the sparsity coefficients and $$\|\cdot\|_0$$ is the number of non-zero velocity components.
+
+$${\rm EMD}(\cdot,\cdot)$$ is the Earth Mover's Distance between two distributions. The selection of EMD rather than Euclidean distance is mainly due to two reasons. First, the quantization of BVP introduces approximation error, i.e., projection of velocity components to the Doppler spectrum bin might be adjacent to the true one. Such quantization error can be relieved by EMD, which takes the distance between bins into consideration. Second, there are unknown scaling factors between the BVP and Doppler spectrum, making the Euclidean distance inapplicable.
 
 Please refer to our [Widar3.0 project](#user-content-fn-2)[^2] for more details.
 
 ## Integration with Wireless Sensing Simulator
 
-We have integrated the feature extraction algorithms for AoA, ToF, and Doppler spectrum into the Wireless Sensing Simulator. As shown in Fig.9, we can extract the above features through a simple graphical interface, where the true and estimated values of the geometric features are displayed simultaneously to evaluate the performance of the algorithm. It is worth noting that the traditional feature extraction algorithms that we have integrated into the Wireless Sensing Simulator are relatively simple, and more complicated and advanced feature extraction algorithms are welcome to be added to this chapter and integrated into the simulator.
+We have integrated the feature extraction algorithms for AoA, ToF, and Doppler spectrum into the Wireless Sensing Simulator. As shown in Figure 11, we can extract the above features through a simple graphical interface, where the true and estimated values of the geometric features are displayed simultaneously to evaluate the performance of the algorithm. It is worth noting that the traditional feature extraction algorithms that we have integrated into the Wireless Sensing Simulator are relatively simple, and more complicated and advanced feature extraction algorithms are welcome to be added to this chapter and integrated into the simulator.
 
-<figure><img src=".gitbook/assets/interface.png" alt=""><figcaption><p>Fig. 9. Wireless sensing simulator GUI with feature extraction algorithms.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/interface.png" alt=""><figcaption><p>Fig. 11. Wireless sensing simulator GUI with feature extraction algorithms.</p></figcaption></figure>
 
 [^1]: [https://dl.acm.org/doi/abs/10.1145/3300061.3300133](https://dl.acm.org/doi/abs/10.1145/3300061.3300133)
 

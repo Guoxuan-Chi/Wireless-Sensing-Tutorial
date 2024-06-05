@@ -38,7 +38,7 @@ The Wireless Sensing Simulator is a CSI simulator developed by the MobiSense gro
 
 Wireless Sensing Simulator can simulate the CSI data of any protocol under the 802.11 protocol family, and it can even simulate the CSI data of a cellular network with freely set variables such as bandwidth, center frequency, number of subcarriers, number of antennas, and so on. In Wireless Sensing Simulator, we can use our own modeled 3D scene to complete the simulation, where the location, orientation, and number of access points (APs) and IoT devices are modifiable. The simulation is realized based on the ray tracing model, and the geometrical information (e.g., AoA, AoD, and ToF) of all multipath signals between AP and IoT devices will be available. The figure below demonstrates the simulated communication link between the AP and different IoT devices in an indoor environment.
 
-<figure><img src=".gitbook/assets/raytracing.jpg" alt=""><figcaption><p>Fig. 4. The raytracing process of simulation in an indoor environment.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/raytracing.jpg" alt=""><figcaption><p>Fig. 5. The raytracing process of simulation in an indoor environment.</p></figcaption></figure>
 
 We integrate the traditional AoA, ToF, and Doppler spectrum estimation algorithms, and implement a interactive GUI,  which will be described in detail in the CSI Feature Extraction chapter.&#x20;
 
