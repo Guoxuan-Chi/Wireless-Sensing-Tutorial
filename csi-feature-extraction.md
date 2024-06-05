@@ -1,7 +1,7 @@
 # 🪄 CSI Feature Extraction
 
-{% hint style="info" %}
-All the code and data in this tutorial are available. Click [**here**](https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip) to download it!&#x20;
+{% hint style="success" %}
+All the code and data in this tutorial are available. Click [**here**](https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip) to download it!
 {% endhint %}
 
 The CSI features lay the fundation of wireless sensing. In particular, for different sensing tasks, choosing the most appropriate features can effectively improve the system performance. In addition, the quality of the extracted features determines the effectiveness of the sensing system.
@@ -74,14 +74,12 @@ disp("The estimated distance is: " + num2str(est_dist) + " m");
 
 ## Time of Flight
 
-
-
 <figure><img src=".gitbook/assets/p2c2_ToF.png" alt=""><figcaption><p>Fig. 6. The relationship between ToF and CIR.</p></figcaption></figure>
 
 ToF is the time duration the signal propagates from the transmitter to the receiver along a specific path. Given the frequency $f$, the phase shift introduced by the ToF $\tau$ is:
 
 $$
-\phi_{\mathrm{ToF}} = -2\pi f \tau.  (13)
+\phi_{\mathrm{ToF}} = -2\pi f \tau. (13)
 $$
 
 As the superimposition of multipath signals, CSI can be represented based on the ray-tracing model:
@@ -167,9 +165,7 @@ end
 
 ## Angle of Arrival and Angle of Departure
 
-&#x20;
-
-<figure><img src=".gitbook/assets/p2c2_AoA_AoD.png" alt=""><figcaption><p> Fig. 7. Angle of Arrival and Angle of Departure.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/p2c2_AoA_AoD.png" alt=""><figcaption><p>Fig. 7. Angle of Arrival and Angle of Departure.</p></figcaption></figure>
 
 When a NIC equipes with multiple antennas, a local coordinate at the device can be created. As shown in Figure 7, for a transmitter, the angle of departure (AoD) $$\varphi$$ represents the direction in the local coordinate along which the transmitted signal is emitted. For a receiver, the angle of arrival (AoA) $$\theta$$ represents the direction in the local coordinate along which the received signal is captured. Since the antennas are spatially separated, non-zero phase shifts between antennas are introduced. The phase shifts depend on the AoA/AoD. Specifically, suppose the relative location between two antennas is $$\bm{\Delta{l}}=(\Delta_x, \Delta_y)$$ and the unit direciton vector of AoA is $$\bm{e}=(\cos\theta, \sin\theta)$$, the phase shift between the two antennas is:
 
@@ -221,7 +217,7 @@ where $$\bm{P}$$ is the covariance matrix of transmission vector $$\bm{F}$$. The
 
 The covariance matrix $$\bm{S}$$ has $$M$$ eigenvalues $$\lambda_{1},\cdots,\lambda_{M}$$ associated with $$M$$ eigenvectors $$\bm{e}{1},\bm{e}{1},\cdots,\bm{e}_{M}$$. Sorted in a non-descending order, the smallest $$M-D$$ eigenvalues correspond to the noise while the rest $$D$$ correspond to the $$D$$ incident signals.
 
-In other word, the $$M$$-dimension space can be divided into two orthogonal subspace, the noise subspace $$\bm{E}_{N}$$  expanded by the eigenvectors $$\bm{e}_{1},\cdots,\bm{e}_{M-D}$$ and the signal subspace $$\bm{E}_{S}$$ expanded by eigenvectors $$\bm{e}_{M-D+1},\cdots,\bm{e}_{M}$$ (or equivalently $$D$$ array steering vector $$\bm{a}(\theta_{1}),\cdots,\bm{a}(\theta_{D})$$).
+In other word, the $$M$$-dimension space can be divided into two orthogonal subspace, the noise subspace $$\bm{E}_{N}$$ expanded by the eigenvectors $$\bm{e}_{1},\cdots,\bm{e}_{M-D}$$ and the signal subspace $$\bm{E}_{S}$$ expanded by eigenvectors $$\bm{e}_{M-D+1},\cdots,\bm{e}_{M}$$ (or equivalently $$D$$ array steering vector $$\bm{a}(\theta_{1}),\cdots,\bm{a}(\theta_{D})$$).
 
 To solve for the array steering vectors (thus AoA), MUSIC plots the reciprocal of squared distance $$Q(\theta)$$ for points along the $$\theta$$ continue to the noise subspace as a function of $$\theta$$:
 
@@ -276,9 +272,9 @@ Besides the methods explicitly solving for Angle of Arrival (AoA) and Angle of D
 
 <figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Fig. 8. Grid Search based AoA and AoD extraction algorithm.</p></figcaption></figure>
 
-Assuming the antenna spacing of the Access Point (AP) is $$d$$, for a wave with an incidence angle of $$\theta$$, a phase difference of $$2\pi\frac{d\sin\theta}{\lambda}$$ is introduced between two antennas. For each incidence angle $$\theta$$, we construct an operator $$\epsilon_{\mathrm{AoA}} = e^{j 2 \pi \frac{d\sin\theta}{\lambda}}$$ representing the phase difference between the two antennas. We then conjugate-multiply the CSI received by the two antennas spaced by $$d$$, followed by multiplying with the operator $$\epsilon_{\mathrm{AoA}}$$, and then take the real part as a representation of the "matching degree" for the corresponding AoA. We define a minimum $$\Delta$$ as the search unit and then iterate over all angles to calculate the "matching degree" for AoA. If the corresponding angle is correct, theoretically, the final multiplication result should be a pure real number; otherwise, it will be imaginary, and the value after taking the real part will be relatively small.&#x20;
+Assuming the antenna spacing of the Access Point (AP) is $$d$$, for a wave with an incidence angle of $$\theta$$, a phase difference of $$2\pi\frac{d\sin\theta}{\lambda}$$ is introduced between two antennas. For each incidence angle $$\theta$$, we construct an operator $$\epsilon_{\mathrm{AoA}} = e^{j 2 \pi \frac{d\sin\theta}{\lambda}}$$ representing the phase difference between the two antennas. We then conjugate-multiply the CSI received by the two antennas spaced by $$d$$, followed by multiplying with the operator $$\epsilon_{\mathrm{AoA}}$$, and then take the real part as a representation of the "matching degree" for the corresponding AoA. We define a minimum $$\Delta$$ as the search unit and then iterate over all angles to calculate the "matching degree" for AoA. If the corresponding angle is correct, theoretically, the final multiplication result should be a pure real number; otherwise, it will be imaginary, and the value after taking the real part will be relatively small.
 
-For simplicity, assume the angles between antenna pairs 1-3 and 1-2 are perpendicular. Let the angles of the incident wave projected onto the lines where antenna pairs 1-2/1-3 are located be $$\theta_{12}^{\mathrm{AoA}}$$ and $$\theta_{13}^{\mathrm{AoA}}$$ respectively. The azimuth is calculated as $$\bm{e}_{\mathrm{AoA}} = [\cos\theta_{12}^{\mathrm{AoA}}, \cos\theta_{13}^{\mathrm{AoA}}]$$.&#x20;
+For simplicity, assume the angles between antenna pairs 1-3 and 1-2 are perpendicular. Let the angles of the incident wave projected onto the lines where antenna pairs 1-2/1-3 are located be $$\theta_{12}^{\mathrm{AoA}}$$ and $$\theta_{13}^{\mathrm{AoA}}$$ respectively. The azimuth is calculated as $$\bm{e}_{\mathrm{AoA}} = [\cos\theta_{12}^{\mathrm{AoA}}, \cos\theta_{13}^{\mathrm{AoA}}]$$.
 
 The following function `grid_search_aoa` intends to estimate the 2D AoA by matching the most appropriate angle.
 
@@ -399,8 +395,6 @@ end
 
 ## Phase Shift
 
-
-
 <figure><img src=".gitbook/assets/p2c2_DFS.png" alt=""><figcaption><p>Fig. 9. Phase shift spectrum (a.k.a Doppler spectrum) of three different moving path.</p></figcaption></figure>
 
 Non-zero phase shift $$\Delta \phi$$ across different packets is caused by the relative movement of the transmitter, receiver, or objects in the propagation path of the signal. It equals the changing rate of the path length of the signal.\
@@ -444,8 +438,6 @@ end
 ```
 
 ## Body-coordinate Velocity Profile
-
-&#x20;
 
 <figure><img src=".gitbook/assets/vp.png" alt=""><figcaption><p>Fig. 10. Relationship between the BVP and Doppler spectrum. Each velocity component in BVP is projected onto the normal direction of a link, and contributes to the power of the corresponding radial velocity component in the Doppler spectrum.</p></figcaption></figure>
 

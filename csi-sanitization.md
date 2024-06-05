@@ -1,11 +1,11 @@
 # 🌊 CSI Sanitization
 
-{% hint style="info" %}
-All the code and data in this tutorial are available. Click [**here**](https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip) to download!&#x20;
+{% hint style="success" %}
+All the code and data in this tutorial are available. Click [**here**](https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip) to download!
 {% endhint %}
 
 {% hint style="warning" %}
-This section is an **advanced content**, and is written for developers who already have enough experience in designing wireless localization and tracking systems. If you are a beginner, or a researcher only focusing on deep-learning-based wireless sensing, you may skip this section.&#x20;
+This section is an **advanced content**, and is written for developers who already have enough experience in designing wireless localization and tracking systems. If you are a beginner, or a researcher only focusing on deep-learning-based wireless sensing, you may skip this section.
 {% endhint %}
 
 The wireless sensing models and features described in previous sections are consistent with the EM propagation theory and geometry. However, they don't consider the various types of noise caused by imperfect implementations of transceiver hardware. This section focuses on various CSI error sources and the corresponding error cancellation algorithms.
@@ -123,7 +123,7 @@ Specifically, during the OFDM modulation process, each subcarrier of should have
 After extensive research and experiments, we have observed two facts.
 
 * First, for a specific type of NIC, the nonlinear amplitude/phase error of CSI is fixed. This means that the correction task can be accomplished if we use a known length coaxial cable connected to the transceiver port. Before performing the sensing task, measure a representative set of CSI amplitude and phase, record the nonlinear characteristics, and eliminate the nonlinearity in the subsequent steps.
-* Second, we observe that the middle part of the subcarrier is free of nonlinear errors, and the nonlinear characteristics of both sides are also fixed.&#x20;
+* Second, we observe that the middle part of the subcarrier is free of nonlinear errors, and the nonlinear characteristics of both sides are also fixed.
 
 Therefore, the function below the code performs the following steps to tackle the CSI nonlinearity:
 
