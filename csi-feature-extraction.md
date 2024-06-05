@@ -1,7 +1,7 @@
 # 🪄 CSI Feature Extraction
 
 {% hint style="info" %}
-All the code and data in this tutorial are available.  Click [**here**](http://tns.thss.tsinghua.edu.cn/wst/wst\_code.zip) to download!&#x20;
+All the code and data in this tutorial are available. Click [**here**](https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip) to download it!&#x20;
 {% endhint %}
 
 The CSI features lay the fundation of wireless sensing. In particular, for different sensing tasks, choosing the most appropriate features can effectively improve the system performance. In addition, the quality of the extracted features determines the effectiveness of the sensing system.
