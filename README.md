@@ -15,7 +15,7 @@ We believe this tutorial will help people in other research fields break into wi
 
 
 {% hint style="success" %}
-All the code and data in this tutorial are available. Click \[**here**]\([https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip](https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip)) to download it!
+All the code and data in this tutorial are available. Click [**here**](https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip) to download it!
 {% endhint %}
 
 {% hint style="success" %}
