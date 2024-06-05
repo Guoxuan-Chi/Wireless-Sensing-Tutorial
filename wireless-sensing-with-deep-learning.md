@@ -1,16 +1,14 @@
 # 🖥️ Wireless Sensing with Deep Learning
 
 {% hint style="info" %}
-All the code and data in this tutorial are available. Click [**here**](https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip) to download!&#x20;
+All the code and data in this tutorial are available. Click [**here**](https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip) to download!
 
 This section introduces a series of learning algorithms, especially the prevalent deep neural network models such as CNN and RNN, and their applications in wireless sensing. This section also proposes a complex-valued neural network to accomplish learning and inference based on wireless features efficiently.
 {% endhint %}
 
 This section will present a working example to demonstrate how to apply different types of complex-valued neural networks for wireless sensing. Besides, we also provide a traditional real-valued CNN for DFS classification.
 
-Specifically, we use commodity Wi-Fi to recognize six human gestures. The gestures are illustrated in Figure 12. We deploy a Wi-Fi transmitter and six receivers in a typical classroom, and the device setup is sketched in Figure 13. The users are asked to perform gestures at the five marked locations and to five orientations. The data samples can be found in our widar3.0 dataset .&#x20;
-
-
+Specifically, we use commodity Wi-Fi to recognize six human gestures. The gestures are illustrated in Figure 12. We deploy a Wi-Fi transmitter and six receivers in a typical classroom, and the device setup is sketched in Figure 13. The users are asked to perform gestures at the five marked locations and to five orientations. The data samples can be found in our widar3.0 dataset .
 
 <figure><img src=".gitbook/assets/gestures.png" alt=""><figcaption><p>Fig. 12. Sketches of gestures evaluated in the experiment.</p></figcaption></figure>
 
@@ -25,7 +23,7 @@ The `TrainDataset` class in PyTorch is designed for loading and processing Wi-Fi
 * **`getitem(self, index)`** retrieves the data item at the specified index `index` in the dataset. This method first obtains the path, then uses the `get_mat` method to load and transform the data file, followed by the `transform` method for further data processing. Finally, it extracts the label using the `get_label` method from the path, and returns a tuple of the data and label.
 * **`get_label(self, path)`** extracts the label from the path of the data file. The label is parsed from the filename, which includes several parameters separated by `-` where the second parameter is used as the label and is converted to an integer type.
 * **`get_mat(self, path)`** loads the data file using the `scipy.io.loadmat` function to load `.mat` files and extracts an array named `cfr_array`. It then transforms the array into a complex tensor in PyTorch format.
-* **`transformers_preprocess(self, x)`**  preprocesses the complex tensor. This method first separates the real and imaginary parts of the tensor, then rearranges and interpolates them to a specific size, standardizing different lengths of the time dimension to `1000`, and finally merges them back into a complex tensor.
+* **`transformers_preprocess(self, x)`** preprocesses the complex tensor. This method first separates the real and imaginary parts of the tensor, then rearranges and interpolates them to a specific size, standardizing different lengths of the time dimension to `1000`, and finally merges them back into a complex tensor.
 
 {% code lineNumbers="true" fullWidth="false" %}
 ```python
@@ -210,7 +208,7 @@ We have defined a testing function `test`, which is used to assess the performan
 
 Drawing inspiration from classic models in the field of computer vision, we have developed versions of AlexNet, ResNet-18, and ViT that support complex numbers, tailored specifically for the characteristics of Wi-Fi CSI data. These three models can handle input tensors of complex numbers with the shape `[batch, 1000, 90]`, where `1000` represents the temporal length and `90` represents the spatial dimensions of the Wi-Fi CSI (3 receivers, each with 30 subcarriers). For AlexNet and ResNet-18, the data from the three different receivers are treated as three channels; for the ViT model, we adopt a technique similar to that used in computer vision for image patching, reorganizing the tensor shape to shorten the temporal dimension and expand the spatial dimension.
 
-Building on this foundation, and referencing the latest developments in the field of wireless sensing, we have implemented a complex-valued **spectrogram learning neural network (**[**SLNet**](#user-content-fn-1)[^1]**)** for the classification of complex-valued DFS.&#x20;
+Building on this foundation, and referencing the latest developments in the field of wireless sensing, we have implemented a complex-valued **spectrogram learning neural network (**[**SLNet**](#user-content-fn-1)[^1]**)** for the classification of complex-valued DFS.
 
 To facilitate comparison, we also provide a conventional real-valued CNN+RNN architecture that classifies based on the magnitude of DFS. This dual approach allows researchers and developers to evaluate the effectiveness of complex-valued neural processing against traditional real-valued methods, providing insight into the nuances of handling complex signal data in practical applications.
 
@@ -475,8 +473,6 @@ class RF_Transformer(nn.Module):
         return x
 </code></pre>
 
-
-
 ### Real-Valued Neural Networks
 
 This part introduces a series of real-valued learning algorithms, especially the prevalent deep neural network models such as CNN and RNN, and their applications in wireless sensing.
@@ -507,7 +503,7 @@ from sklearn.model_selection import train_test_split
 
 Then we define some parameters, including the hyperparameters and the data path. The fraction of testing data is defined as `0.1`. To simplify the problem, we only use six gesture types in the widar3.0 dataset.
 
-```
+```python
 fraction_for_test = 0.1
 data_dir = 'widar30dataset/DFS/20181130/'
 ALL_MOTION = [1,2,3,4,5,6]
@@ -522,7 +518,7 @@ f_learning_rate = 0.001
 
 The program begins with loading data with the predefined function `load_data`. The loaded data are split into train and test by calling the API function `train_test_split`. The labels of the training data are encoded into the one-hot format with the predefined function `onehot_encoding`.
 
-<pre><code><strong># Load data
+<pre class="language-python"><code class="lang-python"><strong># Load data
 </strong>data, label = load_data(data_dir)
 print('\nLoaded dataset of ' + str(label.shape[0]) + ' samples, each sized ' + str(data[0,:,:,:,:].shape) + '\n')
 
@@ -635,7 +631,7 @@ def normalize_data(data_1):
 
 The `zero_padding` function is used to align all the data samples to have the same duration. The padded length is specified by the parameter `T_MAX`.
 
-```Python
+```python
 def zero_padding(data, T_MAX):
     # data(list)=>data_pad(ndarray): [6,121,T1/T2/...]=>[6,121,T_MAX]
     data_pad = []
@@ -715,9 +711,7 @@ Except for the basic neural network components, some high-level network architec
 
 We now introduce the implementation code in detail.
 
-
-
-<figure><img src=".gitbook/assets/DNN_Arch_Adv.png" alt=""><figcaption><p>Fig. 18. Adversarial learning network architecture. </p></figcaption></figure>
+<figure><img src=".gitbook/assets/DNN_Arch_Adv.png" alt=""><figcaption><p>Fig. 18. Adversarial learning network architecture.</p></figcaption></figure>
 
 In the Widar3.0 dataset , we collect gesture data when the users stand at different locations. As discussed in [#phase-shift](csi-feature-extraction.md#phase-shift "mention"), human locations have significant impact on the DFS measurements. To mitigate this impact, we treat human locations as different domains and build an adversarial learning network to recognize gestures irrespective of domains. In the program, we first load data, labels, and domains from the dataset and split them into train and test. Both label and domain are encoded into the one-hot format.
 
@@ -898,7 +892,7 @@ We now present the implementation code in detail.
 
 <figure><img src=".gitbook/assets/DNN_Arch_CVNN.png" alt=""><figcaption><p>Fig. 19. Complex-valued SEN architecture.</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/SEN_training.png" alt=""><figcaption><p>Fig. 20. The training process of the signal processing network. </p></figcaption></figure>
+<figure><img src=".gitbook/assets/SEN_training.png" alt=""><figcaption><p>Fig. 20. The training process of the signal processing network.</p></figcaption></figure>
 
 Different from previous sections, we use the PyTorch platform to implement the network. PyTorch provides the interface to implement custom layers, which makes the implementation of the CVNN much more convenient. We first import some necessary packages as follows.
 
@@ -1280,7 +1274,7 @@ def normalize_data(data_1):
 
 Figure 21 and 22 demonstrates the raw and enhanced spectrograms of pushing and pulling gestures.
 
-<figure><img src=".gitbook/assets/spec_gesture_1.png" alt=""><figcaption><p>Fig. 21. The measured spectrogram of a pushing and pulling gesture. </p></figcaption></figure>
+<figure><img src=".gitbook/assets/spec_gesture_1.png" alt=""><figcaption><p>Fig. 21. The measured spectrogram of a pushing and pulling gesture.</p></figcaption></figure>
 
 <figure><img src=".gitbook/assets/spec_gesture_2.png" alt=""><figcaption><p>Fig. 22. The enhanced spectrogram from the SEN of a pushing and pulling gesture.</p></figcaption></figure>
 
