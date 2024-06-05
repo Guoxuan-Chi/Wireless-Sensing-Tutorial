@@ -1,7 +1,7 @@
 # 🌊 CSI Sanitization
 
 {% hint style="info" %}
-All the code and data in this tutorial are available.  Click [**here**](http://tns.thss.tsinghua.edu.cn/wst/wst\_code.zip) to download!&#x20;
+All the code and data in this tutorial are available. Click [**here**](https://github.com/Guoxuan-Chi/Wireless-Sensing-Tutorial/releases/download/v0.1.0-alpha/Hands-on-Wireless-Sensing.zip) to download!&#x20;
 {% endhint %}
 
 {% hint style="warning" %}
