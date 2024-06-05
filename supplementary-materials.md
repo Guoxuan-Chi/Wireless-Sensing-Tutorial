@@ -7,7 +7,7 @@ This project is currently developed and maintained by the Tsinghua **MobiSense G
 {% hint style="info" %}
 We warmly invite all colleagues who are interested in wireless sensing to contribute to our tutorial.
 
-&#x20;If you're interested in becoming a more involved collaborator, please contact the authors to apply for Team Member status. Alternatively, for minor contributions, you can directly make changes by clicking on “Edit on GitHub” on the right side of the page and submitting a pull request.&#x20;
+&#x20;If you're interested in becoming a more involved collaborator, please contact the authors to apply for Team Member status. Alternatively, for minor contributions, you can directly make changes by clicking on **Edit on GitHub** on the right side of the page and submitting a pull request.&#x20;
 
 We look forward to your valuable contributions to enhance this resource**😄**
 {% endhint %}

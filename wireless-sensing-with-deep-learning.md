@@ -485,7 +485,7 @@ This part introduces a series of real-valued learning algorithms, especially the
 
 Convolutional Neural Network (CNN) contributes to the recent advances in understanding images, videos, and audios. Some works have exploited CNN for wireless signal understanding in wireless sensing tasks and achieved promising performance. This part will present a working example to demonstrate how to apply CNN for wireless sensing. The data samples can be found in our released dataset. We extract DFS from raw CSI signals and feed them into a CNN network. The network architecture is shown in Figure. 11.
 
-<figure><img src=".gitbook/assets/DNN_Arch_CNN.png" alt=""><figcaption><p>Real-valued CNN</p></figcaption></figure>
+<figure><img src=".gitbook/assets/DNN_Arch_CNN.png" alt=""><figcaption><p>Real-valued CNN Architecture</p></figcaption></figure>
 
 We now introduce the implementation code in detail.
 
@@ -587,45 +587,35 @@ def load_data(path_to_data):
     label = []
     for data_root, data_dirs, data_files in os.walk(path_to_data):
         for data_file_name in data_files:
-
             file_path = os.path.join(data_root,data_file_name)
             try:
                 data_1 = scio.loadmat(file_path)['doppler_spectrum']    # [6,121,T]
                 label_1 = int(data_file_name.split('-')[1])
                 location = int(data_file_name.split('-')[2])
                 orientation = int(data_file_name.split('-')[3])
-                repetition = int(data_file_name.split('-')[4])
-                
+                repetition = int(data_file_name.split('-')[4])  
                 # Downsample
                 data_1 = data_1[:,:,0::10]
-
                 # Select Motion
                 if (label_1 not in ALL_MOTION):
                     continue
-
                 # Normalization
-                data_normed_1 = normalize_data(data_1)
-                
+                data_normed_1 = normalize_data(data_1)  
                 # Update T_MAX
                 if T_MAX < np.array(data_1).shape[2]:
                     T_MAX = np.array(data_1).shape[2]                
             except Exception:
                 continue
-
             # Save List
             data.append(data_normed_1.tolist())
-            label.append(label_1)
-            
+            label.append(label_1)    
     # Zero-padding
     data = zero_padding(data, T_MAX)
-
     # Swap axes
     data = np.swapaxes(np.swapaxes(data, 1, 3), 2, 3)   # [N,6,121,T_MAX]=>[N,T_MAX,6,121]
     data = np.expand_dims(data, axis=-1)                # [N,T_MAX,6,121]=>[N,T_MAX,6,121,1]
-
     # Convert label to ndarray
     label = np.array(label)
-
     # data(ndarray): [N,T_MAX,6,121,1], label(ndarray): [N,]
     return data, label
 ```
@@ -682,13 +672,13 @@ def build_model(input_shape, n_class):
     return model
 ```
 
-## 2. Real-valued RNN
+#### 2. Real-valued RNN
 
-Recurrent Neural Network (RNN) is designed for modeling temporal dynamics of sequences and is commonly used for time series data analysis like speech recognition and natural language processing. Wireless signals are highly correlated over time and can be processed with RNN. Some workshave demonstrated the potential of RNN for wireless sensing tasks. In this section, we will present a working example of combining CNN and RNN to perform gesture recognition with Wi-Fi. The experimental settings are the same as in \sect{sec:cnn}. We also extract DFS from the raw CSI as the input feature of the network. The network architecture is shown in Figure. 12.
+Recurrent Neural Network (RNN) is designed for modeling temporal dynamics of sequences and is commonly used for time series data analysis like speech recognition and natural language processing. Wireless signals are highly correlated over time and can be processed with RNN. Some workshave demonstrated the potential of RNN for wireless sensing tasks. In this section, we will present a working example of combining CNN and RNN to perform gesture recognition with Wi-Fi. The experimental settings are the same as in the previous part. We also extract DFS from the raw CSI as the input feature of the network. The network architecture is shown in Figure. 12.
+
+<figure><img src=".gitbook/assets/DNN_Arch_CNNRNN.png" alt=""><figcaption><p>Real-valued RNN Architecture</p></figcaption></figure>
 
 We now introduce the implementation code in detail.
-
-&#x20;\*\* Fig. 12. Recurrent Neural Network architecture. \*\*
 
 Most of the code is the same as in \sect{sec:cnn} except for the model definition. To define the model, we use two-dimensional convolutional layer and max-pooling layer on the dimensional except for the time dimension of the data. We adopt the GRU layer as the recurrent layer.
 
@@ -719,15 +709,17 @@ def build_model(input_shape, n_class):
     return model
 ```
 
-## Real-valued Adversarial Learning
+#### 3. Real-valued Adversarial Learning
 
 Except for the basic neural network components, some high-level network architectures also play essential roles in wireless sensing. Similar to computer vision tasks, wireless sensing also suffer from domain misalignment problem. Wireless signals can be reflected by the surrounding objects during propagation and will be flooded with target-irrelevant signal components. The sensing system trained in one deployment environment can hardly be applied directly in other settings without adaptation. Some works try to adopt adversarial learning techniques to tackle this problem and achieve promising performance. This section will give an example of how to apply this technique in wireless sensing tasks. Specifically, we build a gesture recognition system with Wi-Fi, similar to that in \sect{sec:cnn}. We try to achieve consistent performance across different human locations and orientations. The network architecture is shown in Figure. 13.
 
 We now introduce the implementation code in detail.
 
-&#x20;\*\* Fig. 13. Adversarial learning network architecture. \*\*
 
-In the Widar3.0 dataset , we collect gesture data when the users stand at different locations. As discussed in \sect{sec:DFS}, human locations have significant impact on the DFS measurements. To mitigate this impact, we treat human locations as different domains and build an adversarial learning network to recognize gestures irrespective of domains. In the program, we first load data, labels, and domains from the dataset and split them into train and test. Both label and domain are encoded into the one-hot format.
+
+<figure><img src=".gitbook/assets/DNN_Arch_Adv.png" alt=""><figcaption><p>Adversarial learning network architecture. </p></figcaption></figure>
+
+In the Widar3.0 dataset , we collect gesture data when the users stand at different locations. As discussed in [#phase-shift](csi-feature-extraction.md#phase-shift "mention"), human locations have significant impact on the DFS measurements. To mitigate this impact, we treat human locations as different domains and build an adversarial learning network to recognize gestures irrespective of domains. In the program, we first load data, labels, and domains from the dataset and split them into train and test. Both label and domain are encoded into the one-hot format.
 
 ```python
 # Load data
@@ -787,7 +779,6 @@ def load_data(path_to_data):
     domain = []
     for data_root, data_dirs, data_files in os.walk(path_to_data):
         for data_file_name in data_files:
-
             file_path = os.path.join(data_root,data_file_name)
             try:
                 data_1 = scio.loadmat(file_path)['doppler_spectrum']    # [6,121,T]
@@ -795,39 +786,30 @@ def load_data(path_to_data):
                 location_1 = int(data_file_name.split('-')[2])
                 orientation_1 = int(data_file_name.split('-')[3])
                 repetition_1 = int(data_file_name.split('-')[4])
-                
                 # Downsample
                 data_1 = data_1[:,:,0::10]
-
                 # Select Motion
                 if (label_1 not in ALL_MOTION):
                     continue
-
                 # Normalization
-                data_normed_1 = normalize_data(data_1)
-                
+                data_normed_1 = normalize_data(data_1)    
                 # Update T_MAX
                 if T_MAX < np.array(data_1).shape[2]:
                     T_MAX = np.array(data_1).shape[2]                
             except Exception:
                 continue
-
             # Save List
             data.append(data_normed_1.tolist())
             label.append(label_1)
             domain.append(location_1)
-            
     # Zero-padding
     data = zero_padding(data, T_MAX)
-
     # Swap axes
     data = np.swapaxes(np.swapaxes(data, 1, 3), 2, 3)   # [N,6,121,T_MAX]=>[N,T_MAX,6,121]
     data = np.expand_dims(data, axis=-1)                # [N,T_MAX,6,121]=>[N,T_MAX,6,121,1]
-
     # Convert label and domain to ndarray
     label = np.array(label)
     domain = np.array(domain)
-
     # data(ndarray): [N,T_MAX,6,121,1], label(ndarray): [N,], domain(ndarray): [N,]
     return data, label, domain
 ```
@@ -892,7 +874,7 @@ def custom_loss_domain():
     return lossfn
 ```
 
-## Complex-valued Spectrogram Learning Neural Network
+### Complex-valued Spectrogram Learning Neural Network
 
 In this section, we will present a more complicated wireless sensing task with deep learning. Many wireless sensing approaches employ Fast Fourier Transform (FFT) on a time series of RF data to obtain time-frequency spectrograms of human activities. FFT suffers from errors due to an effect known as leakage, when the block of data is not periodic (the most common case in practice), which results in a smeared spectrum of the original signal and further leads to misleading data representation for learning-based sensing. Classical approaches reduce leakage by windowing, which cannot eliminate leakage entirely. Considering the significant fitting capability of deep neural networks, we can design a signal processing network to learn an optimal function to minimize or nearly eliminate the leakage and enhance the spectrums, which we call the Signal Enhancement Network (SEN).
 
@@ -1302,8 +1284,8 @@ def normalize_data(data_1):
 
 Figure. 18 and 19 demonstrates the raw and enhanced spectrograms of pushing and pulling gestures.
 
-&#x20;\*\* Fig. 18. The measured spectrogram of a pushing and pulling gesture. \*\*
+<figure><img src=".gitbook/assets/spec_gesture_1.png" alt=""><figcaption><p>Fig. 18. The measured spectrogram of a pushing and pulling gesture. </p></figcaption></figure>
 
-&#x20;\*\* Fig. 19. The enhanced spectrogram from the SEN of a pushing and pulling gesture.\*\*
+<figure><img src=".gitbook/assets/spec_gesture_2.png" alt=""><figcaption><p>Fig. 19. The enhanced spectrogram from the SEN of a pushing and pulling gesture.</p></figcaption></figure>
 
 [^1]: [https://www.usenix.org/conference/nsdi23/presentation/yang-zheng](https://www.usenix.org/conference/nsdi23/presentation/yang-zheng)
