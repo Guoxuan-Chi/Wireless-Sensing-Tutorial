@@ -6,44 +6,331 @@ All the code and data in this tutorial are available. Click [**here**](http://tn
 This section introduces a series of learning algorithms, especially the prevalent deep neural network models such as CNN and RNN, and their applications in wireless sensing. This section also proposes a complex-valued neural network to accomplish learning and inference based on wireless features efficiently.
 {% endhint %}
 
-This section will present a working example to demonstrate how to apply CNN for wireless sensing. Specifically, we use commodity Wi-Fi to recognize six human gestures. The gestures are illustrated in Figure. 9. We deploy a Wi-Fi transmitter and six receivers in a typical classroom, and the device setup is sketched in Figure. 10. The users are asked to perform gestures at the five marked locations and to five orientations. The data samples can be found in our widar3.0 dataset .&#x20;
+This section will present a working example to demonstrate how to apply different types of complex-valued neural networks for wireless sensing. Besides, we also provide a traditional real-valued CNN for DFS classification.
+
+Specifically, we use commodity Wi-Fi to recognize six human gestures. The gestures are illustrated in Figure. 9. We deploy a Wi-Fi transmitter and six receivers in a typical classroom, and the device setup is sketched in Figure. 10. The users are asked to perform gestures at the five marked locations and to five orientations. The data samples can be found in our widar3.0 dataset .&#x20;
+
+
 
 <figure><img src=".gitbook/assets/gestures.png" alt=""><figcaption><p>Fig. 9. Sketches of gestures evaluated in the experiment.</p></figcaption></figure>
 
 <figure><img src=".gitbook/assets/floor_plan.png" alt=""><figcaption><p>Fig. 10. The setup of Wi-Fi devices for gesture recognition task.</p></figcaption></figure>
 
-
-
 ## Data Preperation
 
+The `TrainDataset` class in PyTorch is designed for loading and processing Wi-Fi CSI data, which is commonly employed in wireless communication and sensing applications. Here is a description of the functions within this class:
 
+* **`init(self, transform=None)`** initializes the dataset by reading a log file named `shuffle.txt`, which contains a list of paths to data files. The class uses the first 90% of these paths for training and stores them. If a `transform` parameter is provided, it will be used for data transformation; otherwise, the default `transformers_preprocess` method is applied.
+* **`len(self)`** returns the number of data entries in the dataset, which corresponds to the length of the training paths list.
+* **`getitem(self, index)`** retrieves the data item at the specified index `index` in the dataset. This method first obtains the path, then uses the `get_mat` method to load and transform the data file, followed by the `transform` method for further data processing. Finally, it extracts the label using the `get_label` method from the path, and returns a tuple of the data and label.
+* **`get_label(self, path)`** extracts the label from the path of the data file. The label is parsed from the filename, which includes several parameters separated by `-` where the second parameter is used as the label and is converted to an integer type.
+* **`get_mat(self, path)`** loads the data file using the `scipy.io.loadmat` function to load `.mat` files and extracts an array named `cfr_array`. It then transforms the array into a complex tensor in PyTorch format.
+* **`transformers_preprocess(self, x)`**  preprocesses the complex tensor. This method first separates the real and imaginary parts of the tensor, then rearranges and interpolates them to a specific size, standardizing different lengths of the time dimension to `1000`, and finally merges them back into a complex tensor.
+
+{% code lineNumbers="true" fullWidth="false" %}
+```python
+import torch
+from torch.utils.data import Dataset
+import torch.nn.functional as F
+from einops import rearrange
+import math
+from scipy.io import loadmat
+
+class TrainDataset(Dataset):
+    def __init__(self, transform=None):
+        super().__init__()
+        self.path_log = "./csi/shuffle.txt"
+        # In shuffle.txt, the first 90% are for training, the last 10% are for testing
+        self.path_list = []
+        with open(self.path_log, 'r') as txt:
+            for line in txt:
+                self.path_list.append(line[:-1])
+        self.train_len = math.floor(len(self.path_list)*0.9)
+        self.path_list = self.path_list[:self.train_len]
+        if transform:
+            self.transform = transform
+        else:
+            self.transform = self.transformers_preprocess
+
+    def __len__(self):
+        return len(self.path_list)
+    
+    def __getitem__(self, index):
+        path = self.path_list[index]
+        tensor = self.get_mat(path)
+        if self.transform:
+            tensor = self.transform(tensor)
+        label = self.get_label(path)
+        return tensor, label
+    
+    def get_label(self, path):
+        path = path.split("/")[-1][:-4]
+        id, a, b, c, d, Rx = path.split("-")
+        label = int(a)-1
+        return label
+       
+    def get_mat(self, path):
+        array = loadmat(path)['cfr_array']
+        tensor = torch.from_numpy(array)
+        tensor = tensor.to(torch.complex64)
+        return tensor
+
+    def transformers_preprocess(self, x):
+        real_part = torch.real(x)
+        real_part = rearrange(real_part, "l d -> 1 d l")
+        real_part = F.interpolate(real_part, size=1000, mode='nearest-exact')
+        real_part = rearrange(real_part, "1 d l -> l d")
+        imag_part = torch.imag(x)
+        imag_part = rearrange(imag_part, "l d -> 1 d l")
+        imag_part = F.interpolate(imag_part, size=1000, mode='nearest-exact')
+        imag_part = rearrange(imag_part, "1 d l -> l d")
+        complex_tensor = torch.complex(real_part ,imag_part)
+        return complex_tensor
+```
+{% endcode %}
+
+Similarly, we have implemented the `TestDataset` class, which is almost identical to the `TrainDataset` class, except for a change in line 24 of the code. While the `TrainDataset` selects the first 90% of the data from `shuffle.txt` for training purposes, the `TestDataset` uses the remaining 10% of the data from `shuffle.txt` for testing.
+
+```python
+class TestDataset(Dataset):
+    def __init__(self, transform=None):
+        super().__init__()
+        self.path_log = "./csi/shuffle.txt"
+        # In shuffle.txt, the first 90% are for training, the last 10% are for testing
+        self.path_list = []
+        with open(self.path_log, 'r') as txt:
+            for line in txt:
+                self.path_list.append(line[:-1])
+        self.train_len = math.floor(len(self.path_list)*0.9)
+        self.path_list = self.path_list[self.train_len:]    # Difference betten TestDataset and TrainDataset
+        if transform:
+            self.transform = transform
+        else:
+            self.transform = self.transformers_preprocess
+```
 
 ## Training and Testing
 
+Our training script is designed to train complex-valued AlexNet, ResNet, and Transformer models. Below is a detailed description of the code:
 
+* **`init_weights(model)`** initializes the model weights. It checks the type of the model, and if it is a linear or convolutional layer, it initializes the weights into a normal distribution.
+* **`train(model_type, device)`** is the main training function. It accepts the model type (“AlexNet”, “ResNet", or "Transformer”) and the device (such as CUDA or CPU) as parameters.
+  1. Firstly, it creates an instance of the model according to the `model_type`.
+  2. Then, it applies the `init_weights` function to initialize the model weights.
+  3. The model is then moved to the specified device.
+  4. Training parameters are defined, including a batch size of 64, epochs set to 200, the loss function as cross-entropy loss suitable for multi-class tasks, an initial learning rate (which varies depending on the model), optimizer (SGD or AdamW), and a learning rate scheduler (StepLR, reducing the learning rate by half every ten rounds).
+  5. An instance of `TrainDataset` is created, and a `DataLoader` is used to load data in batches.
+  6. Training is conducted for the specified number of epochs, each including forward propagation, loss calculation, backpropagation, and optimization steps.
+  7. After each epoch, the loss and accuracy are printed, and the learning rate is updated using the learning rate scheduler.
+  8. Every 5 epochs, the model is saved, and the `test` function is used to evaluate the model, printing out the test loss and accuracy.
+* **`train("AlexNet", device = torch.device("cuda:0"))`** calls the `train` function to train the AlexNet model and specifies the use of a CUDA device. The commented lines are for training the ResNet and Transformer models, respectively.
 
+```python
+import torch
+from torch import nn
+from train_dataset import TrainDataset
+from torch.optim.lr_scheduler import StepLR
+from AlexNet import AlexNet
+from Resnet import ResNet18
+from Transformer import RF_Transformer
+from test import test
 
+def init_weights(model):
+    if type(model) in [nn.Linear, nn.Conv3d, nn.Conv2d, nn.Conv1d]:
+        nn.init.normal_(model.weight, std=0.03)
+
+def train(model_type, device):
+    print("model_type: ", model_type)
+    if model_type == "AlexNet":
+        model = AlexNet()
+    elif model_type == "ResNet":
+        model = ResNet18()
+    elif model_type == "Transformer":
+        model = RF_Transformer()
+    model.apply(init_weights)
+    model.to(device)
+    batch_size = 64
+    epoch = 200
+    myloss = nn.CrossEntropyLoss().to(device)
+    init_lr = 3e-3
+    optimizer = torch.optim.SGD(model.parameters(), lr = init_lr)
+    # optimizer = torch.optim.AdamW(model.parameters(), lr = init_lr)
+    scheduler = StepLR(optimizer, step_size=10, gamma=0.5)
+    train_dataset = TrainDataset()
+    train_dataloader = torch.utils.data.DataLoader(
+        dataset=train_dataset,
+        batch_size=batch_size,
+        shuffle=True
+    ) 
+    for i in range(epoch):
+        model.train()  
+        total_loss = 0
+        correct = 0
+        print("-----{} epoch for training-----".format(i + 1))
+        for data in train_dataloader:
+            csi, label = data
+            csi = csi.to(device)
+            label = label.to(device)
+            x = model(csi)
+            loss = myloss(x, label)
+            loss = loss.requires_grad_()
+            total_loss += loss * x.size(0)
+            model.zero_grad()
+            loss.backward()
+            optimizer.step()
+            correct += (x.argmax(axis=1) == label).sum().item()
+        print("Loss:{}, acc:{}".format(total_loss/train_dataset.__len__(), correct/train_dataset.__len__()))
+        scheduler.step()
+        if (i+1)%5==0:  # for every 5 epochs to save model and test
+            save_path = "/srv/csj/tutorial_submit/model_file/" + model_type + "_model_{}.pth".format(i+1)
+            torch.save(model, save_path)
+            acc, avg_loss = test(device, save_path)
+            print("-----{} epoch for testing-----".format(i + 1))
+            print("Loss:{}, acc:{}".format(acc, avg_loss))
+            
+train("AlexNet", device = torch.device("cuda:0"))
+# train("ResNet", device = torch.device("cuda:0"))
+# train("Transformer", device = torch.device("cuda:0"))
+```
+
+We have defined a testing function `test`, which is used to assess the performance of deep learning models trained on the Wi-Fi CSI dataset. Here is a detailed description of the code:
+
+**`test(device, model_path)`** accepts the device (such as CUDA or CPU) and the model path as parameters.
+
+1. Firstly, it creates an instance of `TestDataset`.
+2. Then, it uses `DataLoader` to load data, with a batch size set to 1 and without random shuffling.
+3. Next, it loads the pretrained model from the specified path using the `torch.load` function, and moves the model to the specified device.
+4. It calls `model.eval()` to set the model to evaluation mode, which deactivates features like dropout and batch normalization that are used during training.
+5. A cross-entropy loss function `myloss` is defined and moved to the specified device.
+6. It initializes the count of correct predictions `correct` and the total loss `total_loss`.
+7. It iterates over the `DataLoader`, performing forward propagation on each data item, calculating the loss, and accumulating both the loss and the number of correct predictions.
+8. Finally, it calculates the accuracy `accuracy` and the average loss `avg_loss`, and returns these two values.
 
 ## Model Construction
 
-### 1. Convolutional Neural Network
+Drawing inspiration from classic models in the field of computer vision, we have developed versions of AlexNet, ResNet-18, and ViT that support complex numbers, tailored specifically for the characteristics of Wi-Fi CSI data. These three models can handle input tensors of complex numbers with the shape `[batch, 1000, 90]`, where `1000` represents the temporal length and `90` represents the spatial dimensions of the Wi-Fi CSI (3 receivers, each with 30 subcarriers). For AlexNet and ResNet-18, the data from the three different receivers are treated as three channels; for the ViT model, we adopt a technique similar to that used in computer vision for image patching, reorganizing the tensor shape to shorten the temporal dimension and expand the spatial dimension.
 
-Convolutional Neural Network (CNN) contributes to the recent advances in understanding images, videos, and audios. Some works have exploited CNN for wireless signal understanding in wireless sensing tasks and achieved promising performance. We extract DFS from raw CSI signals and feed them into our modified ResNet-18 network.
+Building on this foundation, and referencing the latest developments in the field of wireless sensing, we have implemented a complex-valued **spectrogram learning neural network (**[**SLNet**](#user-content-fn-1)[^1]**)** for the classification of complex-valued DFS.&#x20;
+
+To facilitate comparison, we also provide a conventional real-valued CNN+RNN architecture that classifies based on the magnitude of DFS. This dual approach allows researchers and developers to evaluate the effectiveness of complex-valued neural processing against traditional real-valued methods, providing insight into the nuances of handling complex signal data in practical applications.
+
+### Complex-Valued Neural Networks
+
+Complex-valued neural networks, compared to traditional real-valued neural networks, are better suited to the data type of Channel State Information (CSI). Real and complex neurons exhibit significant differences. As shown in the figure below, complex neurons can effectively combine information from both the real and imaginary parts, often resulting in superior performance. This ability to handle complex numbers inherently aligns with the nature of CSI data, which includes both amplitude and phase information, enabling more nuanced and effective processing of wireless signal characteristics.
+
+<figure><img src=".gitbook/assets/FC_real.png" alt=""><figcaption><p>Fig. Real-valued neurons.</p></figcaption></figure>
+
+<figure><img src=".gitbook/assets/FC_complex.png" alt=""><figcaption><p>Fig. Complex-valued nerons.</p></figcaption></figure>
+
+#### 1. AlexNet
+
+We have developed a variant of the classic AlexNet, adapted to process complex data using PyTorch. This complex-valued neural network is specifically designed to leverage the inherent properties of complex data in wireless communication signals, such as Wi-Fi CSI. Below is a comprehensive breakdown of the code structure:
+
+**1.1. Library Imports:**
+
+* **`torch`:** Core library of PyTorch, used for constructing and training neural networks.
+* **`torch.nn`:** Provides essential building blocks for neural network layers.
+* **`torch.nn.functional`:** Offers functions for activations, loss calculations, and more.
+* **`einops`:** A versatile library for tensor operations, simplifying dimension transformations.
+* **`complex.complex_layers`:** Custom layers designed for handling complex data operations.
+
+**1.2. `AlexNet` Class Definition:**
+
+* The class inherits from `nn.Module`.
+* **Initialization in `__init__`:**
+  * **Convolution Layers (`conv1` to `conv5`):** These layers are adapted to handle complex data types `torch.complex64`.
+  * **Complex Max Pooling Layers (`maxpool1` to `maxpool3`):** Specifically designed for pooling operations on complex tensors.
+  * **Fully Connected Layers (`fc1` to `fc3`):** fc1 handles complex data, while `fc2` and `fc3` process real numbers.
+  * **Complex to Real Layer (`c2r`):** Transforms complex tensor outputs into real tensor formats.
+  * **Dropout Layers (`dp1` and `dp2`):** dp1 is designed for complex tensors to prevent overfitting, and dp2 handles real tensors.
+  * **Activation Functions (`relu` and `real_relu`):** relu is used for complex tensors, and real\_relu is used for real tensors.
+
+**1.3. `Forward` Method:**
+
+* Defines the forward propagation path through the network.
+* The input tensor `x` is first re-arranged using the `einops.rearrange` function to match the dimensions required by the convolution layers.
+* The data flows through a sequence of convolution layers, followed by complex pooling and activation functions.
+* `Dropout` layers are applied to reduce the risk of overfitting.
+* Data passes through the fully connected layers to produce the final output `x`.
 
 ```python
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
+from complex.complex_layers import *
+
+class AlexNet(nn.Module):
+    def __init__(self, num_classes=6):
+        super(AlexNet, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=96, kernel_size=[51, 4], stride=[18, 1], padding=[0, 0], dtype=torch.complex64)
+        self.maxpool1 = ComplexMaxPool2d(kernel_size = [3, 2], stride=[2, 1])
+        self.conv2 = nn.Conv2d(in_channels=96, out_channels=256, kernel_size=[5, 5], stride=[1, 1], padding=[2, 2], dtype=torch.complex64)
+        self.maxpool2 = ComplexMaxPool2d(kernel_size = [3, 3], stride=[2, 2])
+        self.conv3 = nn.Conv2d(in_channels=256, out_channels=384, kernel_size=[3, 3], stride=[1, 1], padding=[1, 1], dtype=torch.complex64)
+        self.conv4 = nn.Conv2d(in_channels=384, out_channels=384, kernel_size=[3, 3], stride=[1, 1], padding=[1, 1], dtype=torch.complex64)
+        self.conv5 = nn.Conv2d(in_channels=384, out_channels=256, kernel_size=[3, 3], stride=[1, 1], padding=[1, 1], dtype=torch.complex64)
+        self.maxpool3 = ComplexMaxPool2d(kernel_size = [3, 3], stride=[2, 2])
+        self.fc1 = nn.Linear(in_features=6400, out_features=4096, dtype=torch.complex64)
+        self.c2r = ComplexToReal()
+        self.fc2 = nn.Linear(in_features=4096, out_features=4096)
+        self.fc3 = nn.Linear(in_features=4096, out_features=num_classes)
+        self.dp1 = ComplexDropout(0.3)
+        self.dp2 = nn.Dropout(0.1)
+        self.relu = ComplexReLU()
+        self.real_relu = nn.ReLU()
+
+    def forward(self, x):
+        x = rearrange(x, "b l (c d) -> b c l d", c = 3)
+        x = self.relu(self.conv1(x))
+        x = self.maxpool1(x)
+        x = self.relu(self.conv2(x))
+        x = self.maxpool2(x)
+        x = self.relu(self.conv3(x))
+        x = self.relu(self.conv4(x))
+        x = self.relu(self.conv5(x))
+        x = self.maxpool3(x)
+        x = rearrange(x, "b c l d -> b ( c l d )")
+        x = self.dp1(self.relu(self.fc1(x)))
+        x = self.c2r(x)
+        x = self.dp2(self.real_relu(self.fc2(x)))
+        x = self.fc3(x)
+        return x
+```
+
+#### 2. ResNet-18
+
+This PyTorch-based model adapts the classic ResNet-18, originally designed for image recognition, to handle complex-valued data. The modification allows for efficient processing of complex data, such as Wi-Fi CSI or other signal processing applications, enhancing the model's ability to capture intricate patterns and relationships in the data.
+
+**2.1. Class Definitions:**
+
+* **`ResNetBasicBlock`:** Implements the basic residual block of ResNet-18, which includes two convolutional layers and batch normalization layers, coupled with a complex ReLU activation function. This block forms the core building block, facilitating the residual learning that is characteristic of ResNet architectures.
+* **`ResNetDownBlock`:** Implements a downsampling residual block of ResNet-18. It includes an additional convolutional layer and batch normalization layer designed to reduce the dimensions of the feature maps, aiding in efficient data processing and reducing computational load.
+* **`ResNet18`:** Implements the complete ResNet-18 architecture. It begins with an initial convolutional layer, followed by batch normalization and max pooling layers. The model features four residual layers, each containing multiple residual blocks, leading to a global average pooling layer. The architecture concludes with a fully connected layer and a layer that converts complex tensors to real tensors, preparing the output for classification or other tasks.
+
+**2.2. `Forward` Method:**
+
+* The input tensor `x` is first re-arranged using the `einops.rearrange` function to fit the dimension requirements of the initial convolutional layer.
+* Data passes sequentially through the convolutional layers, batch normalization, activation functions, residual blocks, and pooling layers. These layers collectively maintain and refine feature information while preventing the degradation problem typical in deep networks.
+* A global average pooling layer reduces the dimensions of the feature maps, concentrating the essential information into a smaller form factor.
+* A complex to real conversion layer transforms the complex tensor into a real tensor, making it suitable for real-valued outputs needed for classification.
+* The final output `x` is produced by the fully connected layer.
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from einops import rearrange
+from complex.complex_layers import *
 
 class ResNetBasicBlock(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
         super(ResNetBasicBlock, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size[0], stride=stride[0], padding=padding[0])
-        self.bn1 = nn.BatchNorm2d(out_channels)
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size[1], stride=stride[1], padding=padding[1])
-        self.bn2 = nn.BatchNorm2d(out_channels)
-        self.relu = nn.ReLU()
+        self.conv1 = ComplexConv2d(in_channels, out_channels, kernel_size=kernel_size[0], stride=stride[0], padding=padding[0])
+        self.bn1 = ComplexBatchNorm2d(out_channels)
+        self.conv2 = ComplexConv2d(out_channels, out_channels, kernel_size=kernel_size[1], stride=stride[1], padding=padding[1])
+        self.bn2 = ComplexBatchNorm2d(out_channels)
+        self.relu = ComplexReLU()
 
     def forward(self, x):
         output = self.conv1(x)
@@ -56,14 +343,14 @@ class ResNetDownBlock(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride, padding):
         super(ResNetDownBlock, self).__init__()
         self.extra = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size[0], stride=stride[0], padding=padding[0]),
-            nn.BatchNorm2d(out_channels)
+            ComplexConv2d(in_channels, out_channels, kernel_size=kernel_size[0], stride=stride[0], padding=padding[0]),
+            ComplexBatchNorm2d(out_channels)
         )
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size[1], stride=stride[1], padding=padding[1])
-        self.bn1 = nn.BatchNorm2d(out_channels)
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=kernel_size[2], stride=stride[2], padding=padding[2])
-        self.bn2 = nn.BatchNorm2d(out_channels)
-        self.relu = nn.ReLU()
+        self.conv1 = ComplexConv2d(in_channels, out_channels, kernel_size=kernel_size[1], stride=stride[1], padding=padding[1])
+        self.bn1 = ComplexBatchNorm2d(out_channels)
+        self.conv2 = ComplexConv2d(out_channels, out_channels, kernel_size=kernel_size[2], stride=stride[2], padding=padding[2])
+        self.bn2 = ComplexBatchNorm2d(out_channels)
+        self.relu = ComplexReLU()
 
     def forward(self, x):
         extra_x = self.extra(x)
@@ -76,22 +363,24 @@ class ResNetDownBlock(nn.Module):
 class ResNet18(nn.Module):
     def __init__(self, num_classes=6):
         super(ResNet18, self).__init__()
-        self.conv1 = nn.Conv2d(6, 64, kernel_size=[10,111], stride=[1,8], padding=[0,0])
-        self.bn1 = nn.BatchNorm2d(64)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.conv1 = ComplexConv2d(3, 64, kernel_size=[111,3], stride=[8,1], padding=[0,0])
+        self.bn1 = ComplexBatchNorm2d(64)
+        self.maxpool = ComplexMaxPool2d(kernel_size=3, stride=[2,1], padding=1)
         self.layer1 = nn.Sequential(ResNetBasicBlock(64, 64, [3, 3], [1, 1], [1, 1]),
                                     ResNetBasicBlock(64, 64, [3, 3], [1, 1], [1, 1]))
-        self.layer2 = nn.Sequential(ResNetDownBlock(64, 128, [1, 3, 3], [2, 2, 1], [0, 1, 1]),
+        self.layer2 = nn.Sequential(ResNetDownBlock(64, 128, [1, 3, 3], [[2,1], [2,1], 1], [0, 1, 1]),
                                     ResNetBasicBlock(128, 128, [3, 3], [1, 1], [1, 1]))
         self.layer3 = nn.Sequential(ResNetDownBlock(128, 256, [1, 3, 3], [2, 2, 1], [0, 1, 1]),
                                     ResNetBasicBlock(256, 256, [3, 3], [1, 1], [1, 1]))
         self.layer4 = nn.Sequential(ResNetDownBlock(256, 512, [1, 3, 3], [2, 2, 1], [0, 1, 1]),
                                     ResNetBasicBlock(512, 512, [3, 3], [1, 1], [1, 1]))
         self.avgpool = nn.AdaptiveAvgPool2d(output_size=(1, 1))
+        self.c2r = ComplexToReal()
         self.fc = nn.Linear(512, num_classes)
-        self.relu = nn.ReLU()
+        self.relu = ComplexReLU()
 
     def forward(self, x):
+        x = rearrange(x, "b l (c d) -> b c l d", c = 3)
         x = self.relu(self.bn1(self.conv1(x)))
         x = self.maxpool(x)
         x = self.layer1(x)
@@ -100,9 +389,151 @@ class ResNet18(nn.Module):
         x = self.layer4(x)
         x = self.avgpool(x)
         x = rearrange(x, "b d 1 1 -> b d")
+        x = self.c2r(x)
         x = self.fc(x)
         return x
 ```
+
+#### 3. RF-Transformer
+
+The RF-Transformer is a PyTorch-based model that leverages the Transformer architecture, traditionally used in natural language processing, adapted here for sequence data embedded with complex features. This model is particularly tailored for multi-class classification tasks on Wi-Fi CSI data, utilizing an encoder-only structure.
+
+**3.1. `RF_Transformer` Class Definition:**
+
+* Inherits from `nn.Module`.
+* **Initialization in `__init__`:**
+  * **encoder:** A complex-valued Transformer encoder designed to process sequence data with complex features.
+  * **c2r (Complex to Real):** A layer that transforms complex tensors into real tensors, preparing them for final output processing.
+  * **mlp (Multi-Layer Perceptron):** A complex-valued MLP that further processes the output from the encoder.
+  * **classifier:** A sequence of fully connected layers that maps the processed features to class categories.
+
+**3.2 Forward Method of `RF_Transformer` Class:**
+
+* **Input Handling:**
+  * The input `x` is initially transformed into a complex tensor using `torch.stack` along with `torch.real` and `torch.imag` functions.
+* **Processing Path:**
+  * Dimension transformation is applied via the `einops.rearrange` function, mimicking the operation of segmenting images into patches as in Vision Transformers (ViT).
+  * A class token is added to the beginning of the sequence, similar to the ViT model, which is used for the final classification.
+* **Data Processing through Encoder:**
+  * The sequence data, now augmented with a class token, passes through the complex Transformer encoder.
+  * The output corresponding to the class token is extracted and processed through the complex MLP.
+  * A complex to real conversion layer then transforms the complex tensor into a real tensor.
+* **Output Generation:**
+  * The final output `x` is produced through the fully connected layer sequence.
+
+<pre class="language-python"><code class="lang-python"><strong>import torch
+</strong>import torch.nn as nn
+import torch.nn.functional as F
+from einops import rearrange
+from complex.complex_module import *
+
+class RF_Transformer(nn.Module):
+    def __init__(self, num_classes=6, seglen=8, origin_dim=720, dim=720, heads=8, layers=8, dropout=0.0):
+        super(RF_Transformer, self).__init__()
+
+        self.num_classes = num_classes
+        self.seglen = seglen
+        self.encoder_origin_dim = origin_dim
+        self.dim = dim
+        self.heads = heads
+        self.layers = layers
+        self.dropout = dropout
+        self.encoder = ComplexTransformerEncoder(
+                        origin_dim = self.encoder_origin_dim,
+                        key_dim = self.dim,
+                        query_dim = self.dim,
+                        value_dim = self.dim,
+                        hidden_dim = self.dim,
+                        norm_shape = self.dim,
+                        ffn_input_dim = self.dim,
+                        ffn_hidden_dim = self.dim,
+                        num_heads = self.heads,
+                        num_layers = self.layers,
+                        dropout = self.dropout)
+
+        self.c2r = ComplexToReal()
+
+        self.mlp = ComplexMLP(in_features = self.dim, out_features = self.dim )
+
+        self.classifier = nn.Sequential(
+            nn.Linear(self.dim, self.dim),  
+            nn.ReLU(),
+            nn.Dropout(self.dropout),        
+            nn.Linear(self.dim, self.num_classes)
+        )
+
+    def forward(self, x):
+        x = torch.stack((torch.real(x), torch.imag(x)), dim=-1)
+        x = rearrange(x, "b (x s) d I -> b x (s d) I", s = self.seglen)
+        class_token = torch.zeros(x[:,0:1].shape).to(x.device)
+        x = torch.cat((class_token, x), dim = 1)
+        x = self.encoder(x)
+        x = x[:,0]
+        x = self.mlp(x)
+        x = self.c2r(x)
+        x = self.classifier(x)
+        return x
+</code></pre>
+
+
+
+### Real-Valued Neural Networks
+
+This part introduces a series of real-valued learning algorithms, especially the prevalent deep neural network models such as CNN and RNN, and their applications in wireless sensing.
+
+#### 1. Real-valued CNN
+
+Convolutional Neural Network (CNN) contributes to the recent advances in understanding images, videos, and audios. Some works have exploited CNN for wireless signal understanding in wireless sensing tasks and achieved promising performance. This part will present a working example to demonstrate how to apply CNN for wireless sensing. The data samples can be found in our released dataset. We extract DFS from raw CSI signals and feed them into a CNN network. The network architecture is shown in Figure. 11.
+
+<figure><img src=".gitbook/assets/DNN_Arch_CNN.png" alt=""><figcaption><p>Real-valued CNN</p></figcaption></figure>
+
+We now introduce the implementation code in detail.
+
+First, some necessary packages are imported. We use Keras API with TensorFlow as the backend to demonstrate how to implement the neural network.
+
+```python
+import os,sys
+import numpy as np
+import scipy.io as scio
+import tensorflow as tf
+import keras
+from keras.layers import Input, GRU, Dense, Flatten, Dropout, Conv2D, Conv3D, MaxPooling2D, MaxPooling3D, TimeDistributed, Bidirectional, Multiply, Permute, RepeatVector, Concatenate, Dot, Lambda
+from keras.models import Model, load_model
+import keras.backend as K
+from sklearn.metrics import confusion_matrix
+from keras.backend.tensorflow_backend import set_session
+from sklearn.model_selection import train_test_split
+```
+
+Then we define some parameters, including the hyperparameters and the data path. The fraction of testing data is defined as 0.1. To simplify the problem, we only use six gesture types in the widar3.0 dataset.
+
+```
+fraction_for_test = 0.1
+data_dir = 'widar30dataset/DFS/20181130/'
+ALL_MOTION = [1,2,3,4,5,6]
+N_MOTION = len(ALL_MOTION)
+T_MAX = 0
+n_epochs = 200
+f_dropout_ratio = 0.5
+n_gru_hidden_units = 64
+n_batch_size = 32
+f_learning_rate = 0.001
+```
+
+The program begins with loading data with the predefined function `load_data`. The loaded data are split into train and test by calling the API function `train_test_split`. The labels of the training data are encoded into the one-hot format with the predefined function `onehot_encoding`.
+
+<pre><code><strong># Load data
+</strong>data, label = load_data(data_dir)
+print('\nLoaded dataset of ' + str(label.shape[0]) + ' samples, each sized ' + str(data[0,:,:,:,:].shape) + '\n')
+
+# Split train and test
+[data_train, data_test, label_train, label_test] = train_test_split(data, label, test_size=fraction_for_test)
+print('\nTrain on ' + str(label_train.shape[0]) + ' samples\n' +\
+    'Test on ' + str(label_test.shape[0]) + ' samples\n')
+
+# One-hot encoding for train data
+label_train = onehot_encoding(label_train, N_MOTION)
+</code></pre>
 
 After loading and formatting the training and testing data, we defined the model with the predefined function \lstinline{build\_model}. After that, we train the model by calling the API function \lstinline{fit}. The input data and label are specified in the parameters. The fraction of validation data is specified as 0.1.
 
@@ -251,7 +682,7 @@ def build_model(input_shape, n_class):
     return model
 ```
 
-## Recurrent Neural Network
+## 2. Real-valued RNN
 
 Recurrent Neural Network (RNN) is designed for modeling temporal dynamics of sequences and is commonly used for time series data analysis like speech recognition and natural language processing. Wireless signals are highly correlated over time and can be processed with RNN. Some workshave demonstrated the potential of RNN for wireless sensing tasks. In this section, we will present a working example of combining CNN and RNN to perform gesture recognition with Wi-Fi. The experimental settings are the same as in \sect{sec:cnn}. We also extract DFS from the raw CSI as the input feature of the network. The network architecture is shown in Figure. 12.
 
@@ -288,7 +719,7 @@ def build_model(input_shape, n_class):
     return model
 ```
 
-## Adversarial Learning
+## Real-valued Adversarial Learning
 
 Except for the basic neural network components, some high-level network architectures also play essential roles in wireless sensing. Similar to computer vision tasks, wireless sensing also suffer from domain misalignment problem. Wireless signals can be reflected by the surrounding objects during propagation and will be flooded with target-irrelevant signal components. The sensing system trained in one deployment environment can hardly be applied directly in other settings without adaptation. Some works try to adopt adversarial learning techniques to tackle this problem and achieve promising performance. This section will give an example of how to apply this technique in wireless sensing tasks. Specifically, we build a gesture recognition system with Wi-Fi, similar to that in \sect{sec:cnn}. We try to achieve consistent performance across different human locations and orientations. The network architecture is shown in Figure. 13.
 
@@ -461,7 +892,7 @@ def custom_loss_domain():
     return lossfn
 ```
 
-## Complex-valued Neural Network
+## Complex-valued Spectrogram Learning Neural Network
 
 In this section, we will present a more complicated wireless sensing task with deep learning. Many wireless sensing approaches employ Fast Fourier Transform (FFT) on a time series of RF data to obtain time-frequency spectrograms of human activities. FFT suffers from errors due to an effect known as leakage, when the block of data is not periodic (the most common case in practice), which results in a smeared spectrum of the original signal and further leads to misleading data representation for learning-based sensing. Classical approaches reduce leakage by windowing, which cannot eliminate leakage entirely. Considering the significant fitting capability of deep neural networks, we can design a signal processing network to learn an optimal function to minimize or nearly eliminate the leakage and enhance the spectrums, which we call the Signal Enhancement Network (SEN).
 
@@ -874,3 +1305,5 @@ Figure. 18 and 19 demonstrates the raw and enhanced spectrograms of pushing and 
 &#x20;\*\* Fig. 18. The measured spectrogram of a pushing and pulling gesture. \*\*
 
 &#x20;\*\* Fig. 19. The enhanced spectrogram from the SEN of a pushing and pulling gesture.\*\*
+
+[^1]: [https://www.usenix.org/conference/nsdi23/presentation/yang-zheng](https://www.usenix.org/conference/nsdi23/presentation/yang-zheng)

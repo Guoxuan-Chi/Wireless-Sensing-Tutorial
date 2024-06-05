@@ -12,7 +12,7 @@ The wireless sensing models and features described in previous sections are cons
 
 For ease of illustration, code implementation for sanitization is provided, which is a `main` function to call different error cancellation functions and test their performance.
 
-```c
+```matlab
 %{
   CSI Sanitization Algorithm for Wi-Fi sensing.  
   - Input: csi data used for calibration, and csi data that need to be sanitized.

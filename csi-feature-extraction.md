@@ -74,7 +74,9 @@ disp("The estimated distance is: " + num2str(est_dist) + " m");
 
 ## Time of Flight
 
-&#x20;\*\* Fig. 5. The relationship between ToF and CIR. \*\*
+
+
+<figure><img src=".gitbook/assets/p2c2_ToF.png" alt=""><figcaption><p>Fig. 5. The relationship between ToF and CIR.</p></figcaption></figure>
 
 ToF is the time duration the signal propagates from the transmitter to the receiver along a specific path. Given the frequency $f$, the phase shift introduced by the ToF $\tau$ is:
 
@@ -92,7 +94,7 @@ where $N$ is the total number of multipath, and $\alpha\_n$ and $\tau\_n$ are th
 
 The following function `naive_tof` intends to extract the ToF of the strongest path (typically the shortest path) based on inverse Fourier transform.
 
-```c
+```matlab
 function [tof_mat] = naive_tof(csi_data)
     % naive_tof
     % Input:
@@ -128,9 +130,46 @@ function [tof_mat] = naive_tof(csi_data)
 end
 ```
 
+Similar to the methods used for angle estimation, there is also an algorithm that utilizes grid search to determine the time of flight. For a wave with a propagation time of \$$\ta\$$, the induced phase shift should be \$$2 \pi(f+\Delta f) \tau\$$. For each propagation time within the search range, we construct an operator \$$\epsilon\_{\mathrm{ToF\}}=e^{j 2 \pi(f+\Delta f) \tau\$$, where \$$\Delta \$$ represents the frequency offset among different subcarriers. Thus, this operator varies with different frequencies (i.e., different subcarriers). We conjugate-multiply this operator with the received CSI, and then take the real part as a representation of the "matching degree" for the corresponding ToF.The main idea is that if the corresponding \$$\ta\$$ is correct, the result after multiplication should be a pure real number, which effectively represents the magnitude of the path CSI. Conversely, if the \$$\ta\$$ is incorrect, the result obtained by taking the real part should be relatively small.The following function `grid_search_tof` intends to estimate the tof by matching the most appropriate signal propagation time.
+
+```matlab
+function tof = grid_search_tof(CSI, fc_list)
+    % grid_search_tof
+    % Input:
+    %   - CSI is the CSI used for ranging; [T S A L]
+    %   - fc_list is the subcarrier frequency parameters; [1 S]
+    % Output:
+    %   - tof is the rough time-of-flight estimation result; [1 1]    
+    
+    % Select the csi data of one antenna as input.
+    ue_csi1=CSI(:,:,1);
+    % Find the most suitable signal propagation time by means of grid search.
+    time_num = size(ue_csi1,1);
+    tof_list = [];
+    for time = 1:time_num
+        taulist = linspace(1e-10,5e-8,195);
+        lentau = length(taulist);
+        similarity = [];
+        for i = 1:lentau
+            tau = taulist(i);
+            epsilon_e = exp(1j*2*pi*(fc_list)*tau);
+            similarity = [similarity, real(ue_csi1(time,:)*conj(epsilon_e)')];
+        end
+            [~, index] = max(similarity);
+        
+        tof = taulist(index);
+        tof_list = [tof_list, tof];
+    end
+    % Calculate the average of the tof estimates at different sampling points.
+    tof = mean(tof_list,2);
+end
+```
+
 ## Angle of Arrival and Angle of Departure
 
-&#x20;\*\* Fig. 6. Angle of Arrival and Angle of Departure.\*\*
+&#x20;
+
+<figure><img src=".gitbook/assets/p2c2_AoA_AoD.png" alt=""><figcaption><p> Fig. 6. Angle of Arrival and Angle of Departure.</p></figcaption></figure>
 
 When a NIC equipes with multiple antennas, a local coordinate at the device can be created. As shown in Figure. 6, for a transmitter, the angle of departure (AoD) $\varphi$ represents the direction in the local coordinate along which the transmitted signal is emitted. For a receiver, the angle of arrival (AoA) $\theta$ represents the direction in the local coordinate along which the received signal is captured. Since the antennas are spatially separated, non-zero phase shifts between antennas are introduced. The phase shifts depend on the AoA/AoD. Specifically, suppose the relative location between two antennas is $\bm{\Delta{l\}}=(\Delta\_x, \Delta\_y)$ and the unit direciton vector of AoA is $\bm{e}=(\cos\theta, \sin\theta)$, the phase shift between the two antennas is:
 
@@ -169,13 +208,13 @@ where $\bm{a}(\theta\_{k})$ is the array steering vector that characterizes adde
 As shown in Figure. 6, for a linear antenna array with elements well synchronized,
 
 $$
-\tag{19} \bm{a}(\theta)=\left[ \begin{array}{c} 1\\ e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l(1)}}\cdot\bm{e}}\\ e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l(2)}}\cdot\bm{e}}\\ \vdots\\ e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l(M-1)}}\cdot\bm{e}} \end{array} \right].
+\bm{a}(\theta)=\left[ \begin{array}{c} 1\\ e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l(1)}}\cdot\bm{e}}\\ e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l(2)}}\cdot\bm{e}}\\ \vdots\\ e^{-j\frac{2\pi}{\lambda}\bm{\Delta{l(M-1)}}\cdot\bm{e}} \end{array} \right]. (19)
 $$
 
 Suppose $W\_{k}\sim N(0, \sigma^{2})$, and $F\_k$ is a wide-sense stationary process with zero mean value, the $M\times M$ covariance matrix of the received signal vector $\bm{X}$ is:
 
 $$
-\tag{20} \begin{aligned} S &=\overline{X X^{\mathrm{H}}} \\ &=A \overline{F F^{\mathrm{H}}} A^{\mathrm{H}}+\overline{W W^{\mathrm{H}}} \\ &=A P A^{\mathrm{H}}+\sigma^{2} I, \end{aligned}
+\begin{aligned} S &=\overline{X X^{\mathrm{H}}} \\ &=A \overline{F F^{\mathrm{H}}} A^{\mathrm{H}}+\overline{W W^{\mathrm{H}}} \\ &=A P A^{\mathrm{H}}+\sigma^{2} I, \end{aligned} (20)
 $$
 
 where $\bm{P}$ is the covariance matrix of transmission vector $\bm{F}$. The notation $(\cdot)^{\mathrm{H\}}$ represents conjugate transpose and $\overline{(\cdot)}$ represents expectation.
@@ -194,7 +233,7 @@ This yields peaks in $Q(\theta)$ at the bearing of incident signals. It is simil
 
 The following function `naive_aoa` intends to estimate the 3D AoA based on the phase difference, which is similar to Eqn. 15. Note that the following algorithm only considers one path, and thus cannot be applied to mutlipath signals.
 
-```c
+```matlab
 function [aoa_mat] = naive_aoa(csi_data, antenna_loc, est_rco)
     % naive_aoa
     % Input:
@@ -233,9 +272,136 @@ function [aoa_mat] = naive_aoa(csi_data, antenna_loc, est_rco)
 end
 ```
 
+Besides the methods explicitly solving for Angle of Arrival (AoA) and Angle of Departure (AoD), there is another algorithm that utilizes grid search to find the optimal angle. The basic principle of this algorithm is illustrated in the figure below.
+
+<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Fig. 7. Grid Search based AoA and AoD extraction algorithm.</p></figcaption></figure>
+
+Assuming the antenna spacing of the Access Point (AP) is $$d$$, for a wave with an incidence angle of $$\theta$$, a phase difference of $$2\pi\frac{d\sin\theta}{\lambda}$$ is introduced between two antennas. For each incidence angle $$\theta$$, we construct an operator $$\epsilon_{\mathrm{AoA}} = e^{j 2 \pi \frac{d\sin\theta}{\lambda}}$$ representing the phase difference between the two antennas. We then conjugate-multiply the CSI received by the two antennas spaced by $$d$$, followed by multiplying with the operator $$\epsilon_{\mathrm{AoA}}$$, and then take the real part as a representation of the "matching degree" for the corresponding AoA. We define a minimum $$\Delta$$ as the search unit and then iterate over all angles to calculate the "matching degree" for AoA. If the corresponding angle is correct, theoretically, the final multiplication result should be a pure real number; otherwise, it will be imaginary, and the value after taking the real part will be relatively small.&#x20;
+
+For simplicity, assume the angles between antenna pairs 1-3 and 1-2 are perpendicular. Let the angles of the incident wave projected onto the lines where antenna pairs 1-2/1-3 are located be $$\theta_{12}^{\mathrm{AoA}}$$ and $$\theta_{13}^{\mathrm{AoA}}$$ respectively. The azimuth is calculated as $$\bm{e}_{\mathrm{AoA}} = [\cos\theta_{12}^{\mathrm{AoA}}, \cos\theta_{13}^{\mathrm{AoA}}]$$.&#x20;
+
+The following function `grid_search_aoa` intends to estimate the 2D AoA by matching the most appropriate angle.
+
+```matlab
+function theta = grid_search_aoa(CSI, lambda, lambda_list)
+    % grid_search_aoa
+    % Input:
+    %   - CSI is the CSI used for ranging; [T S A L]
+    %   - lambda is the wavelength corresponding to the center frequency of the signal [1 1]
+    %   - lambda_list is the subcarrier lambda parameters; [1 S]
+    % Output:
+    %   - tof is the rough time-of-flight estimation result; [1 1]   
+    % Select the csi data of three antennas as input.
+    ue_csi1=CSI(:,:,1);
+    ue_csi2=CSI(:,:,2);
+    ue_csi3=CSI(:,:,3);
+    % Conjugate-multiply the CSI received by the two antennas.
+    csi_data1=ue_csi3.*conj(ue_csi1);
+    csi_data2=ue_csi2.*conj(ue_csi1);
+    % Find the most suitable angle by means of grid search.
+    distance1=[];
+    distance2=[];
+    intervals=pi/180;
+    for theta=0:intervals:pi
+        distance1=[distance1,real(csi_data1*(exp(-1j*2*pi*lambda/2*cos(theta)./lambda_list))')];
+        distance2=[distance2,real(csi_data2*(exp(-1j*2*pi*lambda/2*cos(theta)./lambda_list))')];
+    end
+    distance1=distance1.';
+    distance2=distance2.';
+    [~,theta1]=max(distance1);
+    [~,theta2]=max(distance2);
+    theta1=theta1*pi/180;
+    theta2=theta2*pi/180;
+    xAoA = mean(cos(theta2),2);
+    yAoA = mean(cos(theta1),2);
+    if (xAoA>0)&&(yAoA>0)
+        theta=atan(xAoA/yAoA);
+    elseif (xAoA>0)&&(yAoA<0)
+        theta=atan(xAoA/yAoA);
+    elseif (xAoA<0)&&(yAoA>0)
+        theta=atan(xAoA/yAoA)+pi;
+    else
+        theta=atan(xAoA/yAoA)-pi;
+    end
+    % Calculate the average of the aoa estimates at different sampling points.
+    theta = theta/pi*180;
+end
+```
+
+## Multiple Dimensional Feature Extraction
+
+Most of the aforementioned methods are based on ideal assumptions. In practical applications, it is often necessary to differentiate the characteristics corresponding to multiple signal propagation paths. Therefore, some recent studies attempt to integrate multiple types of information such as Angle of Arrival (AoA), Angle of Departure (AoD), and Time of Flight (ToF), and estimate a set of optimal multipath characteristics parameters through multiple iterations. These algorithms are more advanced and complex. Accordingly, we provide an example based on the basic conceptual approach of the code. For more details, please refer to the original paper mD-Track[^1].
+
+```matlab
+function path_info_output = mD_track(CSI,num_path)
+    WLAN_paras.num_samples = 1;
+    WLAN_paras.correlation_coefficient = 0.99;
+    WLAN_paras.window_size = 2;
+    WLAN_paras.grid_range = [180,90];
+    WLAN_paras.precison = [1,1,0.5]'; % AoA in degrees, ToF in meters
+    WLAN_paras.threshold = WLAN_paras.precison;
+    WLAN_paras.frequency = 5.8 * 10^9;
+    WLAN_paras.antenna_space_ofwaveLen = [0.5,0.5];
+    WLAN_paras.num_Rantenna = 4; % Recieve Antenna Number
+    WLAN_paras.num_Tantenna = 1; % Transmit Antenna Number
+    WLAN_paras.num_subcarrier = 56; % Subcarrier Number
+    WLAN_paras.frequency_space = 200*1e5/WLAN_paras.num_subcarrier; % Hz
+    WLAN_paras.add_len = 1.1;
+    WLAN_paras.speed_light = 3 * 10^8;
+    WLAN_paras.iterateID = 1;
+    
+    tmp_CSI = CSI;
+    resdual_CSI = CSI;
+    path_info_output = zeros(3,num_path);
+    complex_attenuation = complex(1,num_path);
+    % initial estimation
+    for p = 1:num_path   
+        tmp_CSI = resdual_CSI;
+        % compute the AOA AOD TOF of the next path
+        [path_info_output(1,p),tmp_CSI] = compute_AOA(tmp_CSI,WLAN_paras);
+        [path_info_output(2,p),tmp_CSI] = compute_AOD(tmp_CSI,WLAN_paras);
+        [path_info_output(3,p),tmp_CSI] = compute_TOF(tmp_CSI,WLAN_paras);
+        complex_attenuation(p) = tmp_CSI / (WLAN_paras.num_Tantenna * WLAN_paras.num_Rantenna * WLAN_paras.num_subcarrier); 
+        % calculate the CSI for one specific path
+        onePath_CSI = compute_CSI(WLAN_paras,path_info_output(:,p)) * complex_attenuation(p);
+        % delete the CSI of this path from the residual signal
+        resdual_CSI = resdual_CSI - onePath_CSI;
+    end
+    noise_est = resdual_CSI;
+    stop_mark = zeros(1,num_path);
+    stop_count = 0;
+    % iterative path parameter refinement
+    while stop_count < num_path
+        for p = 1:num_path
+            if stop_mark(p) == 1
+                continue;
+            end
+            one_path_info = path_info_output(:,p);
+            onePath_CSI = compute_CSI(WLAN_paras,path_info_output(:,p)) * complex_attenuation(p);
+            resdual_CSI = noise_est + onePath_CSI;
+            tmp_CSI = resdual_CSI;
+            [path_info_output(1,p),tmp_CSI] = compute_AOA(tmp_CSI,WLAN_paras);
+            [path_info_output(2,p),tmp_CSI] = compute_AOD(tmp_CSI,WLAN_paras);
+            [path_info_output(3,p),tmp_CSI] = compute_TOF(tmp_CSI,WLAN_paras);
+            complex_attenuation(p) = tmp_CSI / (WLAN_paras.num_Tantenna * WLAN_paras.num_Rantenna * WLAN_paras.num_subcarrier); 
+            % if AOA and TOF of this path have little change in this iteration,
+            % they won't be recomputed in the next iteration
+            if abs(one_path_info - path_info_output(:,p)) <= WLAN_paras.threshold
+                stop_mark(p) = 1;
+                stop_count = stop_count + 1;
+            end
+            % update this noise
+            noise_est = resdual_CSI - compute_CSI(WLAN_paras,path_info_output(:,p)) * complex_attenuation(p);        
+        end
+    end
+end
+```
+
 ## Phase Shift
 
-&#x20;\*\* Fig. 7. Phase shift spectrum (a.k.a Doppler spectrum) of three different moving path.\*\*
+
+
+<figure><img src=".gitbook/assets/p2c2_DFS.png" alt=""><figcaption><p>Fig. 7. Phase shift spectrum (a.k.a Doppler spectrum) of three different moving path.</p></figcaption></figure>
 
 Non-zero phase shift $\Delta \phi$ across different packets is caused by the relative movement of the transmitter, receiver, or objects in the propagation path of the signal. It equals the changing rate of the path length of the signal.\
 When multiple packets are received in sequence, the CSI corresponding to the $i^{th}$ received packet is:
@@ -254,9 +420,9 @@ Intuitively, the phase difference indicates the distance change of the $n^{th}$ 
 
 Take a step further, and apply the short-time Fourier transform (STFT) within a sliding window, we can get the spectrum as shown in Figure. 7. The frequency axis reveals the change rate of consecutive CSI data, and implicitly contains the path length change rate. Figure. 7 demonstrates the phase shift spectrum (or the Doppler Spectrum) for three different moving paths.
 
-The following function `naive_stft` calculates the short-time Fourier transform of a series of CSI data. The generated spectrum can be used effectively for many wireless sensing tasks, like gesture recognition and fall detection.
+The following function `naive_spectrum` calculates the short-time Fourier transform of a series of CSI data. The generated spectrum can be used effectively for many wireless sensing tasks, like gesture recognition and fall detection.
 
-```c
+```matlab
 function stft_mat = naive_spectrum(csi_data, sample_rate, visable)
     % naive_spectrum
     % Input:
@@ -324,3 +490,15 @@ where $M$ is the number of Wi-Fi links.
 The sparsity of the number of the velocity components is coerced by the term $\eta|V|\_0$, where $\eta$ represents the sparsity coefficients and $|\cdot|\_0$ is the number of non-zero velocity components.
 
 ${\rm EMD}(\cdot,\cdot)$ is the Earth Mover's Distance between two distributions. The selection of EMD rather than Euclidean distance is mainly due to two reasons. First, the quantization of BVP introduces approximation error, \ie, projection of velocity components to the Doppler spectrum bin might be adjacent to the true one. Such quantization error can be relieved by EMD, which takes the distance between bins into consideration. Second, there are unknown scaling factors between the BVP and Doppler spectrum, making the Euclidean distance inapplicable.
+
+Please refer to our [Widar3.0 project](#user-content-fn-2)[^2] for more details.
+
+## Integration with Wireless Sensing Simulator
+
+We have integrated the feature extraction algorithms for AoA, ToF, and Doppler spectrum into the Wireless Sensing Simulator. As shown in Fig.9, we can extract the above features through a simple graphical interface, where the true and estimated values of the geometric features are displayed simultaneously to evaluate the performance of the algorithm. It is worth noting that the traditional feature extraction algorithms that we have integrated into the Wireless Sensing Simulator are relatively simple, and more complicated and advanced feature extraction algorithms are welcome to be added to this chapter and integrated into the simulator.
+
+<figure><img src=".gitbook/assets/interface.png" alt=""><figcaption><p>Fig. 9. Wireless sensing simulator GUI with feature extraction algorithms.</p></figcaption></figure>
+
+[^1]: [https://dl.acm.org/doi/abs/10.1145/3300061.3300133](https://dl.acm.org/doi/abs/10.1145/3300061.3300133)
+
+[^2]: [http://tns.thss.tsinghua.edu.cn/widar3.0/](http://tns.thss.tsinghua.edu.cn/widar3.0/)
