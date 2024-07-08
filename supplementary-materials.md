@@ -18,7 +18,9 @@ We look forward to your valuable contributions to enhance this resource**😄**
 
 [**Sensing Dataset Platform (SDP)**](http://sdp8.net/) is initiated by ISAC-ETI and collaboratively developed and operated by relevant professional organizations and individuals from both the industrial and academic sectors. The platform aims to provide rich scenarios, extensive use cases, and abundant high-quality sensing datasets to support AI model training and algorithm research in the field of sensing. This endeavor is geared towards advancing the construction of AI and algorithm capabilities in sensing, ultimately driving breakthroughs in key sensing technologies and collectively building a bright future for the sensing industry.
 
-<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption><p>Widar3.0 Dataset</p></figcaption></figure>
+
+[**Widar3.0**](http://tns.thss.tsinghua.edu.cn/widar3.0/) is a Wi-Fi gesture recognition dataset provided by the Tsinghua MobiSense Group. It contains channel state information (CSI) collected from commercial Wi-Fi cards, and the corresponding Doppler Frequency Shift (DFS) and Body-coordinate Velocity Profile (BVP). The dataset consists of 258K gesture instances, with a total collecting time of 8,620 minutes, from 75 different combinations of users, environments, and device placements.&#x20;
 
 ## Reading List
 
@@ -48,15 +50,11 @@ To provide a solid foundation for those new to the field of wireless sensing, we
 
 ## Author Info
 
-<div align="left">
+<div align="center" data-full-width="true">
 
 <figure><img src=".gitbook/assets/image (2).png" alt="" width="144"><figcaption><p>Prof. Zheng Yang</p></figcaption></figure>
 
 </div>
-
-
-
-<table data-view="cards"><thead><tr><th data-card-cover data-type="files"></th><th></th></tr></thead><tbody><tr><td><a href=".gitbook/assets/image (2).png">image (2).png</a></td><td><p><a href="http://tns.thss.tsinghua.edu.cn/~yangzheng/"><strong>Zheng Yang</strong></a> is an associate professor in School of Software and BNRist, Tsinghua University, Beijing, China. He is the leader of the MobiSense Group.</p><p>Zheng Yang was nominated as the IEEE Fellow in 2022, his research interests include Internet of Things, industrial networks, wireless sensing and localization, etc. He is an author and co-author of 4 books and over 60 research papers in premier journals and conferences. He received 4 best paper (candidates) awards and has over 10,000 citations with H-index 60.</p></td></tr></tbody></table>
 
 [**Zheng Yang**](http://tns.thss.tsinghua.edu.cn/\~yangzheng/) is an associate professor in School of Software and BNRist, Tsinghua University, Beijing, China. He is the leader of the MobiSense Group.
 
