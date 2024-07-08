@@ -56,7 +56,7 @@ To provide a solid foundation for those new to the field of wireless sensing, we
 
 
 
-<table data-view="cards"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td></td><td></td><td></td><td><a href=".gitbook/assets/image (2).png">image (2).png</a></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></tbody></table>
+<table data-view="cards"><thead><tr><th data-card-cover data-type="files"></th><th></th></tr></thead><tbody><tr><td><a href=".gitbook/assets/image (2).png">image (2).png</a></td><td><p><a href="http://tns.thss.tsinghua.edu.cn/~yangzheng/"><strong>Zheng Yang</strong></a> is an associate professor in School of Software and BNRist, Tsinghua University, Beijing, China. He is the leader of the MobiSense Group.</p><p>Zheng Yang was nominated as the IEEE Fellow in 2022, his research interests include Internet of Things, industrial networks, wireless sensing and localization, etc. He is an author and co-author of 4 books and over 60 research papers in premier journals and conferences. He received 4 best paper (candidates) awards and has over 10,000 citations with H-index 60.</p></td></tr></tbody></table>
 
 [**Zheng Yang**](http://tns.thss.tsinghua.edu.cn/\~yangzheng/) is an associate professor in School of Software and BNRist, Tsinghua University, Beijing, China. He is the leader of the MobiSense Group.
 
