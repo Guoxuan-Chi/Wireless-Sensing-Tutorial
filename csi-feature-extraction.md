@@ -270,7 +270,7 @@ end
 
 Besides the methods explicitly solving for Angle of Arrival (AoA) and Angle of Departure (AoD), there is another algorithm that utilizes grid search to find the optimal angle. The basic principle of this algorithm is illustrated in the figure below.
 
-<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Fig. 8. Grid Search based AoA and AoD extraction algorithm.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Fig. 8. Grid Search based AoA and AoD extraction algorithm.</p></figcaption></figure>
 
 Assuming the antenna spacing of the Access Point (AP) is $$d$$, for a wave with an incidence angle of $$\theta$$, a phase difference of $$2\pi\frac{d\sin\theta}{\lambda}$$ is introduced between two antennas. For each incidence angle $$\theta$$, we construct an operator $$\epsilon_{\mathrm{AoA}} = e^{j 2 \pi \frac{d\sin\theta}{\lambda}}$$ representing the phase difference between the two antennas. We then conjugate-multiply the CSI received by the two antennas spaced by $$d$$, followed by multiplying with the operator $$\epsilon_{\mathrm{AoA}}$$, and then take the real part as a representation of the "matching degree" for the corresponding AoA. We define a minimum $$\Delta$$ as the search unit and then iterate over all angles to calculate the "matching degree" for AoA. If the corresponding angle is correct, theoretically, the final multiplication result should be a pure real number; otherwise, it will be imaginary, and the value after taking the real part will be relatively small.
 

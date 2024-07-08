@@ -14,13 +14,11 @@ We look forward to your valuable contributions to enhance this resource**😄**
 
 ## Useful Links
 
-1. **Sensing Data Platform**
+<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Sensing Dataset Platform</p></figcaption></figure>
 
+[**Sensing Dataset Platform (SDP)**](http://sdp8.net/) is initiated by ISAC-ETI and collaboratively developed and operated by relevant professional organizations and individuals from both the industrial and academic sectors. The platform aims to provide rich scenarios, extensive use cases, and abundant high-quality sensing datasets to support AI model training and algorithm research in the field of sensing. This endeavor is geared towards advancing the construction of AI and algorithm capabilities in sensing, ultimately driving breakthroughs in key sensing technologies and collectively building a bright future for the sensing industry.
 
-
-1.
-
-
+<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
 
 ## Reading List
 
@@ -50,9 +48,20 @@ To provide a solid foundation for those new to the field of wireless sensing, we
 
 ## Author Info
 
-*   [**Zheng Yang**](http://tns.thss.tsinghua.edu.cn/\~yangzheng/) is an associate professor in School of Software and BNRist, Tsinghua University, Beijing, China. He is the leader of the MobiSense Group.
+<div align="left">
 
-    Zheng Yang was nominated as the IEEE Fellow in 2022, his research interests include Internet of Things, industrial networks, wireless sensing and localization, etc. He is an author and co-author of 4 books and over 60 research papers in premier journals and conferences. He received 4 best paper (candidates) awards and has over 10,000 citations with H-index 60.
+<figure><img src=".gitbook/assets/image (2).png" alt="" width="144"><figcaption><p>Prof. Zheng Yang</p></figcaption></figure>
+
+</div>
+
+
+
+<table data-view="cards"><thead><tr><th></th><th></th><th></th><th data-hidden data-card-cover data-type="files"></th></tr></thead><tbody><tr><td></td><td></td><td></td><td><a href=".gitbook/assets/image (2).png">image (2).png</a></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></tbody></table>
+
+[**Zheng Yang**](http://tns.thss.tsinghua.edu.cn/\~yangzheng/) is an associate professor in School of Software and BNRist, Tsinghua University, Beijing, China. He is the leader of the MobiSense Group.
+
+Zheng Yang was nominated as the IEEE Fellow in 2022, his research interests include Internet of Things, industrial networks, wireless sensing and localization, etc. He is an author and co-author of 4 books and over 60 research papers in premier journals and conferences. He received 4 best paper (candidates) awards and has over 10,000 citations with H-index 60.
+
 * [​](http://tns.thss.tsinghua.edu.cn/wst/authors#guoxuan-chi)[**Guoxuan Chi**](https://scholar.google.com/citations?hl=zh-CN\&user=RkTfnqcAAAAJ) recieved his PhD. degree in 2024, under supervision of Prof. Zheng Yang. He is currently a research assistant at Tsinghua University. His research interests include wireless AI and integrated sensing and communication (ISAC).
 * [​](http://tns.thss.tsinghua.edu.cn/wst/authors#yi-zhang)[**Yi Zhang**](https://scholar.google.com/citations?hl=zh-CN\&user=oJLECGMAAAAJ) recieved his PhD. degree in 2022, under supervision of Prof. Zheng Yang. His research interests include human-centric wireless sensing with Wi-Fi and mmWave Radar.
 * **Guidong Zhang** recieved his PhD. degree in 2023 in Tsinghua University, under supervision of Prof. Zheng Yang. His research interests include wireless sensing with Wi-Fi and mmWave Radar.
